@@ -1,5 +1,4 @@
-// Merge server and client
-// First, change server variables to s_<name>
+// Merged server.c and client.c so this prog can listen and send
 // This sort of works
 /*
 To test:

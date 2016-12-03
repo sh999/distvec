@@ -1,5 +1,5 @@
 // Merge server and client
-// First, change server variables to s_<name>
+// server.c with the variables changed to s_<name>
 #include <stdio.h>      /* for printf() and fprintf() */
 #include <sys/socket.h> /* for socket() and bind() */
 #include <arpa/inet.h>  /* for sockaddr_in and inet_ntoa() */
