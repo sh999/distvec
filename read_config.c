@@ -5,5 +5,9 @@ struct neighbor{
 };
 
 int main(){
-
+	FILE *file;
+	file = open("neighbor_config","r");
+	if (file){
+		while (())
+	}
 }

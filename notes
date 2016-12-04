@@ -1,8 +1,17 @@
+Notes
+
 
 Sample run:
-Configuration file:
-My node
-My port
-Neighbor1 cost1 Neighbor1_address
-Neighbor2 cost2 Neighbor2_address
+Let's say A has neighbors B (IP:10.10.1.1), D (IP:10.10.2.2) of cost 3, 5
+
+A's Configuration file namd config_A, essentially a neighbor table:
+A
+A's port (90210)
+B 3 10.10.1.1
+D 5 10.10.2.2
+
+Program run:
+./clientserver config_A
+
+config_A function:
 
