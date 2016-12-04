@@ -218,13 +218,6 @@ int test_token_struct()
            token = strtok (NULL, " ,");
            n_tokens++;
        }
-       // printf("# of tokens:%d\n",n_tokens);
-       // printf("TOKEN:%s",token);
-       // if(line_num==1){
-       //      strncpy(my_node.name,token,sizeof my_node.name-1);
-       //      my_node.name[255] = '\0';
-
-       // }
        line_num++;
     }
     printf("\nMy node name:%s",my_node.name);
