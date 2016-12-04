@@ -9,7 +9,7 @@
 
 void DieWithError(char *errorMessage);  /* External error handling function */
 
-struct somestruct{
+struct Message{
     int a;
     int b;
 };
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    struct somestruct * recmsg;
+    struct Message * recmsg;
 
     echoServPort = atoi(argv[1]);  /* First arg:  local port */
 
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
         // if ((recvMsgSize = recvfrom(sock, echoBuffer, ECHOMAX, 0,
         //     (struct sockaddr *) &echoClntAddr, &cliAddrLen)) < 0)
         //     DieWithError("recvfrom() failed");
-        if ((recvMsgSize = recvfrom(sock, (struct somestruct*) recmsg, ECHOMAX, 0,
+        if ((recvMsgSize = recvfrom(sock, (struct Message*) recmsg, ECHOMAX, 0,
             (struct sockaddr *) &echoClntAddr, &cliAddrLen)) < 0)
             DieWithError("recvfrom() failed");
         printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));

@@ -16,7 +16,7 @@ int tries=0;   /* Count of times sent - GLOBAL for signal-handler access */
 void DieWithError(char *errorMessage);   /* Error handling function */
 void CatchAlarm(int ignored);            /* Handler for SIGALRM */
 
-struct somestruct{
+struct Message{
     int a;
     int b;
 };
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     int echoStringLen;               /* Length of string to echo */
     int respStringLen;               /* Size of received datagram */
 
-    struct somestruct msg;
+    struct Message msg;
 
     if ((argc < 3) || (argc > 4))    /* Test for correct number of arguments */
     {
