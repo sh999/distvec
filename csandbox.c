@@ -127,6 +127,7 @@ int main(int argc, char *argv[])
     // Get struct from neighbor config file
     struct My_node my_node;
     struct Neighbor n1;
+    // struct Neighbor n2;
     
     parse_config(&my_node,&n1);
     printf("\nMy node name:%s",my_node.name);
@@ -134,6 +135,9 @@ int main(int argc, char *argv[])
     printf("\nNeighbor1 name:%s",n1.name);
     printf("\nNeighbor1 cost:%s",n1.cost);
     printf("\nNeighbor1 address:%s",n1.address);
+    // printf("\nNeighbor2 name:%s",n2.name);
+    // printf("\nNeighbor2 cost:%s",n2.cost);
+    // printf("\nNeighbor2 address:%s",n2.address);
 
     if ((argc < 3) || (argc > 4))    /* Test for correct number of arguments */
     {
@@ -141,7 +145,9 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    c_servIP = argv[1];           /* First arg:  server IP address (dotted quad) */
+    // c_servIP = argv[1];           /* First arg:  server IP address (dotted quad) */
+    printf("using addres:%s",n1.address);
+    c_servIP = n1.address;
     c_echoString = argv[2];       /* Second arg: string to echo */
 
     if ((c_echoStringLen = strlen(c_echoString)) > ECHOMAX)
