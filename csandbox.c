@@ -1,5 +1,6 @@
 //
-// Client that Reads config file, get 1 neighbor info, and send to that one neighbor
+// Client that Reads config file, get 2 neighbor info, and send to both neighbors successively
+
 
 #include <stdio.h>      /* for printf() and fprintf() */
 #include <sys/socket.h> /* for socket(), connect(), sendto(), and recvfrom() */
@@ -29,6 +30,15 @@ struct Neighbor{
     char name[256];
     char cost[256];
     char address[256];
+};
+struct Element {
+    char dest;
+    int dist;
+};
+struct Distance_vector {
+    char sender;
+    int num_of_dests;
+    struct Element content[5];
 };
 
 void parse_config(struct My_node *my_node,struct Neighbor *n1,struct Neighbor *n2)

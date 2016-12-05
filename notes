@@ -15,3 +15,42 @@ Program run:
 
 config_A function:
 
+
+sendto: sock,echostring,echostringlen,echoservaddr
+
+sock: ntohing
+echoservaddr:servip,servport
+
+
+A Neighbor table (parsed config file):
+B
+D
+Tells A where to send, here B and D
+
+Routing table:  tells graph structure from A's pov
+Initially:
+Dest   Distance   NextHop
+B		3  			B
+D 		5 			D
+
+Final routing table:
+Dest   Distance	  NextHop
+B  ...
+C
+D
+E
+F
+
+Between the initial and final, A periodically sends and gets distance vectors
+; e.g. B may send a distance vec to A with:
+B
+3
+E  2
+F  1
+This says, "This is from B. I'm 2 away from you, and I'm 2 away from E, 1 away from F. Update your  routing table for E and F by adding their dists with my dist to you"
+So A will have an updated routing table:
+Dest   Distance   NextHop
+B		3  			B
+D 		5 			D
+E       5			B 			 
+F 		3			B

@@ -28,6 +28,7 @@ int test_config()
     struct Neighbor neighbor1;
     struct Neighbor neighbor2;
 
+    struct Neighbor neighbors[];
 
     fp = fopen("./neighbor_config", "r");
     if (fp == NULL)
