@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
         if ((s_recvMsgSize = recvfrom(s_sock, s_echoBuffer, ECHOMAX, 0,
             (struct sockaddr *) &s_echoClntAddr, &s_cliAddrLen)) < 0)
             DieWithError("recvfrom() failed");
-        printf("GOT SOMETHING\n");
+        printf("\nGot message:%s",s_echoBuffer);
         // printf("Handling client %s\n", inet_ntoa(s_echoClntAddr.sin_addr));
 
         /* Send received datagram back to the client */

@@ -1,5 +1,6 @@
 //
 // Client that Reads config file, get 1 neighbor info, and send to that one neighbor
+// Then sends message to that client periodically every few seconds
 
 #include <stdio.h>      /* for printf() and fprintf() */
 #include <sys/socket.h> /* for socket(), connect(), sendto(), and recvfrom() */
@@ -175,24 +176,42 @@ int main(int argc, char *argv[])
     /* Construct the server address structure */
     memset(&c_echoServAddr, 0, sizeof(c_echoServAddr));    /* Zero out structure */
     c_echoServAddr.sin_family = AF_INET;
-    c_echoServAddr.sin_addr.s_addr = inet_addr(c_servIP);  /* Server IP address */
+    // c_echoServAddr.sin_addr.s_addr = inet_addr(c_servIP);  /* Server IP address */
+    c_echoServAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     c_echoServAddr.sin_port = htons(c_echoServPort);       /* Server port */
-
+    printf("\nwhat");
     // My modifications; deleted client's initial send 
     c_fromSize = sizeof(c_fromAddr);
-    while (1){      // Keep sending periodically indefinitely every 2 seconds
-        sleep(2);   // Wait 2 seconds before sending again
-            if (tries < MAXTRIES)      /* incremented by signal handler */
-            {
-                printf("\nSending periodic message...");
-                // printf("timed out, %d more tries...\n", MAXTRIES-tries);
-                if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
-                            &c_echoServAddr, sizeof(c_echoServAddr)) != c_echoStringLen)
-                    DieWithError("sendto() failed");
-            } 
-            else
-                DieWithError("No Response");
-        }
+    for(;;){
+        /* Set the size of the in-out parameter */
+        s_cliAddrLen = sizeof(s_echoClntAddr);
+
+        /* Block until receive message from a client */
+        if ((s_recvMsgSize = recvfrom(s_sock, s_echoBuffer, ECHOMAX, 0,
+            (struct sockaddr *) &c_fromAddr, &s_cliAddrLen)) < 0)
+            DieWithError("recvfrom() failed");
+        printf("\nGot message:%s",s_echoBuffer);
+    }
+    // while (1){      // Keep sending periodically indefinitely every 2 seconds
+    //     sleep(2);   // Wait 2 seconds before sending again
+    //         if (tries < MAXTRIES)      /* incremented by signal handler */
+    //         {
+    //             printf("\nSending periodic message...");
+    //             // printf("timed out, %d more tries...\n", MAXTRIES-tries);
+    //             if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
+    //                         &c_echoServAddr, sizeof(c_echoServAddr)) != c_echoStringLen)
+    //                 DieWithError("sendto() failed");
+    //              if ((c_respStringLen = recvfrom(c_sock, c_echoBuffer, ECHOMAX, 0,(struct sockaddr *) 
+    //                         &c_fromAddr, &c_fromSize)) < 0)
+    //                 DieWithError("recvfrom() failed");
+    //             else{
+    //                 printf("\nI dunno");
+    //             }
+    //             printf("\nGot message:%s",c_echoBuffer);
+    //         } 
+    //         else
+    //             DieWithError("No Response");
+    //     }
     /* null-terminate the received data */
     c_echoBuffer[c_respStringLen] = '\0';
     printf("Received: %s\n", c_echoBuffer);    /* Print the received data */

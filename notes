@@ -1,5 +1,13 @@
 Notes
 
+Socket notes
+
+Socket needs to be created with default values (PF_INET, etc.)  No address is associated until send/recv
+
+create client_socket
+get server_ip
+sendto(client_socket,server_ip)
+
 
 Sample run:
 Let's say A has neighbors B (IP:10.10.1.1), D (IP:10.10.2.2) of cost 3, 5
