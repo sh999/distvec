@@ -48,7 +48,32 @@ void disp_routing_table (struct Routing_table rt) {
         printf("\n%c\t%d\t%c",rt.element[i].node, rt.element[i].dist, rt.element[i].next_hop);
     }
 }
-
+void update_routing(struct Distance_vector dv, struct Routing_table rt){
+    printf("\nUpdating routing");
+    for(int i = 0; i < rt.num_rows;i++){
+        // printf("\n%c\t%d\t%c",rt.element[i].node, rt.element[i].dist, rt.element[i].next_hop);
+        for(int j = 0; j < dv.num_of_dests; j++){
+            printf("\nChecking if %c matches %c ",rt.element[i].node,dv.element[j].dest);
+            if(rt.element[i].node==dv.element[j].dest){
+                printf("\tMatch");
+                printf("\nrt dist:%d\tdv dist:%d",rt.element[i].dist , dv.element[j].dist);
+                if(dv.element[j].dist<rt.element[i].dist){
+                    printf("\nDecreasing distance");
+                    rt.element[i].dist = dv.element[j].dist;
+                }
+                else{
+                    printf("\nNot decreasing distance");
+                }
+                break;
+            }
+            else{
+                printf("\tNo match");
+            }
+        }
+    }
+    printf("\nAfter updating:");
+    disp_routing_table(rt);
+}
 
 int test_config()
 {
@@ -263,7 +288,7 @@ int test_token_struct()
         free(line);
     exit(EXIT_SUCCESS);
 }
-void test_create_dv(){
+struct Distance_vector test_create_dv(){
     /*
         Test creation of distance vector
     */
@@ -275,8 +300,9 @@ void test_create_dv(){
     dv_incoming.element[1].dest = 'F';
     dv_incoming.element[1].dist = 2;
     disp_distance_vector(dv_incoming);
+    return dv_incoming;
 }
-void test_create_rt(){
+struct Routing_table test_create_rt(){
     /*
         Test creation of routing table
 
@@ -284,22 +310,36 @@ void test_create_rt(){
     struct Distance_vector dv_incoming;
     struct Routing_table rt;
     rt.node = 'A';
-    rt.num_rows = 2;
+    rt.num_rows = 3;
     rt.element[0].node = 'E';
     rt.element[0].dist = 9;
     rt.element[0].next_hop = 'B';
     rt.element[1].node = 'F';
     rt.element[1].dist = 9;
     rt.element[1].next_hop = 'B';
+    rt.element[2].node = 'C';
+    rt.element[2].dist = 2;
+    rt.element[2].next_hop = 'B';
     disp_routing_table(rt);
+    return rt;
 }
 
+void test_update_routing(){
+    struct Distance_vector dv;
+    struct Routing_table rt;
+    dv = test_create_dv();
+    rt = test_create_rt();
+    // disp_distance_vector(dv);
+    // disp_routing_table(rt);
+    update_routing(dv,rt);
+}
 
 int main(void){
     // test_config();
     // test_token();
     // test_tokenize_file();
     // test_token_struct();
-    test_create_dv();
+    // test_create_dv();
     // test_create_rt();
+    test_update_routing();
 }
