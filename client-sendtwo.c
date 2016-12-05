@@ -1,5 +1,6 @@
 //
-// Client that Reads config file, get 1 neighbor info, and send to that one neighbor
+// Client that Reads config file, get 2 neighbor info, and send to both neighbors successively
+
 
 #include <stdio.h>      /* for printf() and fprintf() */
 #include <sys/socket.h> /* for socket(), connect(), sendto(), and recvfrom() */
