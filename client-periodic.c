@@ -1,5 +1,6 @@
 //
 // Client that Reads config file, get 1 neighbor info, and send to that one neighbor
+// Then sends message to that client periodically every few seconds
 
 #include <stdio.h>      /* for printf() and fprintf() */
 #include <sys/socket.h> /* for socket(), connect(), sendto(), and recvfrom() */

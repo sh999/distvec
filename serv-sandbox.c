@@ -58,9 +58,9 @@ int main(int argc, char *argv[])
         // printf("Handling client %s\n", inet_ntoa(s_echoClntAddr.sin_addr));
 
         /* Send received datagram back to the client */
-        // if (sendto(s_sock, s_echoBuffer, s_recvMsgSize, 0, 
-        //      (struct sockaddr *) &s_echoClntAddr, sizeof(s_echoClntAddr)) != s_recvMsgSize)
-        //     DieWithError("sendto() sent a different number of bytes than expected");
+        if (sendto(s_sock, s_echoBuffer, s_recvMsgSize, 0, 
+             (struct sockaddr *) &s_echoClntAddr, sizeof(s_echoClntAddr)) != s_recvMsgSize)
+            DieWithError("sendto() sent a different number of bytes than expected");
     }
     /* NOT REACHED */
 }
