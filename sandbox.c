@@ -16,6 +16,38 @@ struct Neighbor{
     char cost[256];
     char address[256];
 };
+struct DV_Element {
+    char dest;
+    int dist;
+};
+struct Distance_vector {
+    char sender;
+    int num_of_dests;
+    struct DV_Element element[5];
+};
+struct RT_element {
+    char node;
+    int dist;
+    char next_hop;
+};
+struct Routing_table {
+    char node;
+    int num_rows;
+    struct RT_element element[6];
+};
+void disp_distance_vector (struct Distance_vector dv) {
+    printf("\nDistance vector of %c:",dv.sender);
+    for(int i = 0; i < dv.num_of_dests;i++){
+        printf("\n%c\t%d",dv.element[i].dest, dv.element[i].dist);
+    }
+}
+
+void disp_routing_table (struct Routing_table rt) {
+    printf("\nRouting table of %c:",rt.node);
+    for(int i = 0; i < rt.num_rows;i++){
+        printf("\n%c\t%d\t%c",rt.element[i].node, rt.element[i].dist, rt.element[i].next_hop);
+    }
+}
 
 
 int test_config()
@@ -28,7 +60,7 @@ int test_config()
     struct Neighbor neighbor1;
     struct Neighbor neighbor2;
 
-    struct Neighbor neighbors[];
+    // struct Neighbor neighbors[];
 
     fp = fopen("./neighbor_config", "r");
     if (fp == NULL)
@@ -231,10 +263,43 @@ int test_token_struct()
         free(line);
     exit(EXIT_SUCCESS);
 }
+void test_create_dv(){
+    /*
+        Test creation of distance vector
+    */
+    struct Distance_vector dv_incoming;
+    dv_incoming.sender = 'B';
+    dv_incoming.num_of_dests = 2;
+    dv_incoming.element[0].dest = 'E';
+    dv_incoming.element[0].dist = 3;
+    dv_incoming.element[1].dest = 'F';
+    dv_incoming.element[1].dist = 2;
+    disp_distance_vector(dv_incoming);
+}
+void test_create_rt(){
+    /*
+        Test creation of routing table
+
+    */
+    struct Distance_vector dv_incoming;
+    struct Routing_table rt;
+    rt.node = 'A';
+    rt.num_rows = 2;
+    rt.element[0].node = 'E';
+    rt.element[0].dist = 9;
+    rt.element[0].next_hop = 'B';
+    rt.element[1].node = 'F';
+    rt.element[1].dist = 9;
+    rt.element[1].next_hop = 'B';
+    disp_routing_table(rt);
+}
+
 
 int main(void){
     // test_config();
     // test_token();
     // test_tokenize_file();
-    test_token_struct();
+    // test_token_struct();
+    test_create_dv();
+    // test_create_rt();
 }
