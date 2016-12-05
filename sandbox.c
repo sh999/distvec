@@ -35,6 +35,17 @@ struct Routing_table {
     int num_rows;
     struct RT_element element[6];
 };
+struct Config_element {
+    char node[256];
+    char dist[256];
+    char address[256];
+};
+struct Parsed_config {
+    char node[256];
+    char port[256];
+    int num_rows;
+    struct Config_element element[256];
+};
 void disp_distance_vector (struct Distance_vector dv) {
     printf("\nDistance vector of %c:",dv.sender);
     for(int i = 0; i < dv.num_of_dests;i++){
@@ -325,6 +336,12 @@ struct Routing_table test_create_rt(){
 }
 
 void test_update_routing(){
+    /*
+        Create a distance vector and routing table
+        Update routing table by distance vector values
+        In here, the creation of the 2 objects are coded and not from a config file
+        In real program, dv comes from another node and rt comes from init config file
+    */
     struct Distance_vector dv;
     struct Routing_table rt;
     dv = test_create_dv();
@@ -334,6 +351,84 @@ void test_update_routing(){
     update_routing(dv,rt);
 }
 
+void test_routing_table_from_config(){
+    /*
+        Read config file to create initial routing table
+    */
+    printf("\nTesting making init routing table from config file");
+    FILE * fp;
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    // struct My_node my_node;
+    // struct Neighbor n1;
+    struct Parsed_config parsed_config;
+
+
+    fp = fopen("./neighbor_config", "r");
+    if (fp == NULL)
+        exit(EXIT_FAILURE);
+    int line_num = 1;
+    while ((read = getline(&line, &len, fp)) != -1) {
+        printf("Retrieved line of length %zu :\n", read);
+        printf("%s", line);
+
+        char str[256];
+        strncpy(str,line,sizeof str-1);
+        str[255] = '\0';
+        char *token = NULL;
+        int n_tokens = 0;
+
+       // Split the string",  into tokens delimited by spaces and commas
+       token = strtok (str," ,");
+       while (token != NULL)
+       {
+            printf("%s\n", token);
+            if(line_num==1){
+                strncpy(parsed_config.node,token,sizeof parsed_config.node-1);
+                parsed_config.node[255] = '\0';
+            }
+            else if(line_num==2){
+                strncpy(parsed_config.port,token,sizeof parsed_config.port-1);
+                parsed_config.port[255] = '\0';
+            }
+            else{
+                if(n_tokens==0){
+                    strncpy(parsed_config.element[line_num-3].node,token,sizeof parsed_config.element[line_num-3].node-1);
+                    // n1.name[255] = '\0';
+                }
+                if(n_tokens==1){
+                    strncpy(parsed_config.element[line_num-3].dist,token,sizeof parsed_config.element[line_num-3].dist-1);
+                    parsed_config.element[line_num-3].dist[255] = '\0';
+                }
+                if(n_tokens==2){
+                    strncpy(parsed_config.element[line_num-3].address,token,sizeof parsed_config.element[line_num-3].address-1);
+                    parsed_config.element[line_num-3].address[255] = '\0';
+                }
+            }
+           // Different call
+           token = strtok (NULL, " ,");
+           n_tokens++;
+       }
+       line_num++;
+       parsed_config.num_rows = line_num-3;
+       printf("\nLines:%d",parsed_config.num_rows);
+    }
+    printf("\nMy node name:%s",parsed_config.node);
+    printf("\nMy port name:%s",parsed_config.port);
+    for(int i = 0; i < parsed_config.num_rows; i++){
+        printf("Neighbor #%d :%s\tDist:%s\tAddress:%s",i,parsed_config.element[i].node,parsed_config.element[i].dist,parsed_config.element[i].address);
+    }
+    // printf("\nNeighbor1 name:%s",n1.name);
+    // printf("\nNeighbor1 cost:%s",n1.cost);
+    // printf("\nNeighbor1 address:%s",n1.address);
+    
+
+    fclose(fp);
+    if (line)
+        free(line);
+}
 int main(void){
     // test_config();
     // test_token();
@@ -341,5 +436,7 @@ int main(void){
     // test_token_struct();
     // test_create_dv();
     // test_create_rt();
-    test_update_routing();
+    // test_update_routing();
+    test_routing_table_from_config();
+
 }
