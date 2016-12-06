@@ -1,8 +1,10 @@
 // Merged server.c and client.c so this prog can listen and send
 // Based on client-merged-periodic.c
+// Based on multiclient.c
 // See if can send to multiple ip addresses (same port)
 // Cand send to multiple ip addresses as long as the node has received a msg
 // Otherwise will be stuck in listening loop
+// Working on if I can pass through structs finally
 /*
 To test:
 Run a server program listening on 90211
