@@ -32,7 +32,10 @@ client will send msgX, and both3 will get msgX, then will forward msgX to server
 
 int tries=0;   /* Count of times sent - GLOBAL for signal-handler access */
 void CatchAlarm(int ignored);            /* Handler for SIGALRM */
-
+struct Message{
+    int a;
+    int b;
+};
 
 //*****************client**********************
 void DieWithError(char *errorMessage);  /* External error handling function */
@@ -41,11 +44,6 @@ void disp_routing_table (struct Routing_table rt);
 void disp_distance_vector (struct Distance_vector dv);
 struct Distance_vector create_dv_from_rt(struct Routing_table rt);
 struct Routing_table create_rt_from_parsed(struct Parsed_config parsed_config);
-struct Message{
-    int a;
-    int b;
-};
-
 int main(int argc, char *argv[])
 {
     struct Parsed_config parsed_config;
@@ -172,6 +170,10 @@ int main(int argc, char *argv[])
     if (bind(s_sock, (struct sockaddr *) &s_echoServAddr, sizeof(s_echoServAddr)) < 0)
         DieWithError("bind() failed");
     int counter = 0;
+   
+    struct Message msg;
+    msg.a = 33;
+    msg.b = 44;
     for (;;) /* Run forever */
     {
         /* Set the size of the in-out parameter */
@@ -180,17 +182,16 @@ int main(int argc, char *argv[])
         /* Block until receive message from a client */
         printf("\nWaiting for other messages...");
         printf("\n\nCounter:%d",counter);
-        struct Message msg;
-        struct Message * recmsg;
-        msg.a = 33;
-        msg.b = 44;
         if(counter % 5 != 0){
-            while ((s_recvMsgSize = recvfrom(s_sock, (struct Message*)recmsg, ECHOMAX, 0,
+            while ((s_recvMsgSize = recvfrom(s_sock, s_echoBuffer, ECHOMAX, 0,
                 (struct sockaddr *) &s_echoClntAddr, &s_cliAddrLen)) < 0)
                 if (errno == EINTR){
                     printf("\nAttempting to send my message...");
                     // printf("\n#Number of neighbors:%d",parsed_config.num_rows);
                     for(int i = 0; i < parsed_config.num_rows; i++){
+                        // if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
+                        //     &all_addresses[i], sizeof(all_addresses[i])) != c_echoStringLen)
+                        //     DieWithError("sendto() sent a different number of bytes than expected");
                         if (sendto(c_sock, &msg, sizeof(msg), 0, (struct sockaddr *)
                             &all_addresses[i], sizeof(all_addresses[i])) != sizeof(msg))
                             DieWithError("sendto() sent a different number of bytes than expected");
