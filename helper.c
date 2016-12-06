@@ -66,9 +66,10 @@ struct Parsed_config get_routing_table_from_config(){
            n_tokens++;
        }
        line_num++;
-       parsed_config.num_rows = line_num-3;
-       // printf("\nLines:%d",parsed_config.num_rows);
     }
+   parsed_config.num_rows = line_num-3;
+   
+   printf("\nLines:%d",parsed_config.num_rows);
     
     
 
