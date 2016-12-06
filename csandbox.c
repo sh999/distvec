@@ -90,10 +90,10 @@ int main(int argc, char *argv[])
     
     c_servIP = parsed_config.element[0].address;  //SH: set client IP based on parsed config neighbor value
     c_echoString = parsed_config.node;
-
+    printf("\nMsg to send:%s",c_echoString);
     if ((c_echoStringLen = strlen(c_echoString)) > ECHOMAX)
         DieWithError("Echo word too long");
-    
+    printf("Setting up...");
     // SH: Create array of addresses
     struct sockaddr_in all_addresses[parsed_config.num_rows];  //SH: addresses to create sockets from
     // Trying to have client socket to two diff addresses
