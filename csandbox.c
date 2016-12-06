@@ -26,17 +26,13 @@ client will send msgX, and both3 will get msgX, then will forward msgX to server
 #include <errno.h>      /* for errno and EINTR */
 #include <signal.h>     /* for sigaction() */
 
-#define ECHOMAX         2000     /* Longest string to echo */
+#define ECHOMAX         255     /* Longest string to echo */
 #define TIMEOUT_SECS    2       /* Seconds between retransmits */
 #define MAXTRIES        5       /* Tries before giving up */
 
 int tries=0;   /* Count of times sent - GLOBAL for signal-handler access */
 void CatchAlarm(int ignored);            /* Handler for SIGALRM */
 
-struct Message{
-    int a;
-    int b;
-};
 
 //*****************client**********************
 void DieWithError(char *errorMessage);  /* External error handling function */
@@ -45,6 +41,11 @@ void disp_routing_table (struct Routing_table rt);
 void disp_distance_vector (struct Distance_vector dv);
 struct Distance_vector create_dv_from_rt(struct Routing_table rt);
 struct Routing_table create_rt_from_parsed(struct Parsed_config parsed_config);
+struct Message{
+    int a;
+    int b;
+};
+
 int main(int argc, char *argv[])
 {
     struct Parsed_config parsed_config;
@@ -100,22 +101,20 @@ int main(int argc, char *argv[])
     // From the server
     // s_echoServPort = atoi(argv[1]);  /* First arg:  local port */
     s_echoServPort = 90210;  // Hard code what port I will get from
-
+    c_echoServPort = 90210;
 //v****************client**********************
     // c_servIP = argv[1];           /* First arg:  server IP address (dotted quad) */
     // c_echoString = argv[2];       /* Second arg: string to echo */
     
     c_servIP = parsed_config.element[0].address;  //SH: set client IP based on parsed config neighbor value
     c_echoString = parsed_config.node;
-    c_echoString = "hesdfsdfy";
-    printf("size of echostring:%zu",sizeof(c_echoString));
     printf("\nMsg to send:%s",c_echoString);
     if ((c_echoStringLen = strlen(c_echoString)) > ECHOMAX)
         DieWithError("Echo word too long");
-    if (argc == 4)
-        c_echoServPort = atoi(argv[3]);   //Use given port, if any 
-    else
-        c_echoServPort = 7;  /* 7 is well-known port for echo service */
+    // if (argc == 4)
+    //     c_echoServPort = atoi(argv[3]);   //Use given port, if any 
+    // else
+    //     c_echoServPort = 7;  /* 7 is well-known port for echo service */
     printf("Setting up...");
     // SH: Create array of addresses
     struct sockaddr_in all_addresses[parsed_config.num_rows];  //SH: addresses to create sockets from
@@ -181,62 +180,38 @@ int main(int argc, char *argv[])
         /* Block until receive message from a client */
         printf("\nWaiting for other messages...");
         printf("\n\nCounter:%d",counter);
-        struct Distance_vector * incoming_dv;
+        struct Message msg;
+        struct Message * recmsg;
+        msg.a = 33;
+        msg.b = 44;
         if(counter % 5 != 0){
-            while ((s_recvMsgSize = recvfrom(s_sock, (struct Distance_vector*) incoming_dv, ECHOMAX, 0,
+            while ((s_recvMsgSize = recvfrom(s_sock, (struct Message*)recmsg, ECHOMAX, 0,
                 (struct sockaddr *) &s_echoClntAddr, &s_cliAddrLen)) < 0)
                 if (errno == EINTR){
                     printf("\nAttempting to send my message...");
                     // printf("\n#Number of neighbors:%d",parsed_config.num_rows);
                     for(int i = 0; i < parsed_config.num_rows; i++){
-                        printf("\nSIZEOF dv:%zu",sizeof(dv));
-                        // if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
-                        //     &all_addresses[i], sizeof(all_addresses[i])) != c_echoStringLen)
-                        //     DieWithError("sendto() sent a different number of bytes than expected");
-                        if (sendto(c_sock, &dv, sizeof(dv), 0, (struct sockaddr *)
-                            &all_addresses[i], sizeof(all_addresses[i])) != sizeof(dv))
-                            DieWithError("1sendto() sent a different number of bytes than expected");
+                        if (sendto(c_sock, &msg, sizeof(msg), 0, (struct sockaddr *)
+                            &all_addresses[i], sizeof(all_addresses[i])) != sizeof(msg))
+                            DieWithError("sendto() sent a different number of bytes than expected");
                     }
                     if (argc == 5){
                         printf("\nSending message to different port...");
                         // if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
                         // &c_echoServAddr2, sizeof(c_echoServAddr2)) != c_echoStringLen)
-                        DieWithError("2sendto() sent a different number of bytes than expected");
+                        DieWithError("sendto() sent a different number of bytes than expected");
                     }
                     // printf("\nSetting alarm within errno if");
                     alarm(TIMEOUT_SECS);
                 }
             printf("\nGot message from %s", inet_ntoa(s_echoClntAddr.sin_addr));
-            // printf("\nMessage:%s",s_echoBuffer);
-            printf("\nMessage:%s",incoming_dv->sender);
-            // printf("\n")
+            printf("\nMessage:%s",s_echoBuffer);
         }
         else{
             printf("\nForce sending message...");
-            struct Message msg;
             for(int i = 0; i < parsed_config.num_rows; i++){
-                        // size_t test = sendto(c_sock, &dv, sizeof(dv), 0, (struct sockaddr *)
-                        //                 &all_addresses[i], sizeof(all_addresses[i]));
-                        // printf("\nSIZEOF dv:%zu",sizeof(dv));
-                        // printf("\nSIZEOF test:%zu",test);
-                        // if (sendto(c_sock, &dv, sizeof(dv), 0, (struct sockaddr *)
-                        //     &all_addresses[i], sizeof(all_addresses[i])) != sizeof(dv))
-                        //     DieWithError("3sendto() sent a different number of bytes than expected");
-
-                        // size_t test = sendto(c_sock, &msg, sizeof(msg), 0, (struct sockaddr *)
-                        //                 &c_echoServAddr, sizeof(c_echoServAddr));
-                        // printf("\nSIZEOF msg:%zu",sizeof(msg));
-                        // printf("\nSIZEOF test:%zu",test);
-                        // if (sendto(c_sock, &msg, sizeof(msg), 0, (struct sockaddr *)
-                        //     &c_echoServAddr, sizeof(c_echoServAddr)) != sizeof(msg))
-                        //     DieWithError("3sendto() sent a different number of bytes than expected");
-                        printf("\nSIZEOF string:%zu",sizeof(c_echoStringLen));
-                        size_t test = sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
-                           &c_echoServAddr, sizeof(c_echoServAddr));
-                        printf("\nSIZEOF test:%zu",test);
-                        c_echoStringLen = strlen(c_echoString);
-                        if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
-                           &c_echoServAddr, sizeof(c_echoServAddr)) != c_echoStringLen)
+                        if (sendto(c_sock, &msg, sizeof(msg), 0, (struct sockaddr *)
+                            &all_addresses[i], sizeof(all_addresses[i])) != sizeof(msg))
                             DieWithError("sendto() sent a different number of bytes than expected");
                     }
             // if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
@@ -246,7 +221,7 @@ int main(int argc, char *argv[])
                 printf("\nForce sending message to different port...");
                 // if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
                 // &c_echoServAddr2, sizeof(c_echoServAddr2)) != c_echoStringLen)
-                DieWithError("4sendto() sent a different number of bytes than expected");
+                DieWithError("sendto() sent a different number of bytes than expected");
             }
         }
         counter++;
