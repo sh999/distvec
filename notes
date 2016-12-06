@@ -74,6 +74,6 @@ Keep looping
 I think it may be working
 
 addresses
-A to B: 10.10.1.1  to D: 10.10.8.2
+A to B: 10.10.1.1  to D: 10.10.8.1
 B to A: 10.10.1.2
-D to A: 10.10.8.1
+D to A: 10.10.8.2
