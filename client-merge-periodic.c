@@ -54,7 +54,6 @@ int main(int argc, char *argv[])
     int c_echoStringLen;               /* Length of string to echo */
     int c_respStringLen;               /* Size of received datagram */
 //^****************client**********************
-
     // From the server
     // if (argc != 2)         /* Test for correct number of parameters */ 
     // {
@@ -66,7 +65,6 @@ int main(int argc, char *argv[])
         fprintf(stderr,"Usage: %s <Server IP> <Echo Word> [<Echo Port>]\n", argv[0]);
         exit(1);
     }
-
     // From the server
     // s_echoServPort = atoi(argv[1]);  /* First arg:  local port */
     s_echoServPort = 90210;  // Hard code what port I will get from
@@ -84,7 +82,7 @@ int main(int argc, char *argv[])
         c_echoServPort = 7;  /* 7 is well-known port for echo service */
 
     // Mine
-    c_echoServPort = 90211;  // Hard code what this program will send to
+    c_echoServPort = 90210;  // Hard code what this program will send to
 
     /* Create a best-effort datagram socket using UDP */
     if ((c_sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
@@ -105,15 +103,12 @@ int main(int argc, char *argv[])
     c_echoServAddr.sin_addr.s_addr = inet_addr(c_servIP);  /* Server IP address */
     c_echoServAddr.sin_port = htons(c_echoServPort);       /* Server port */
 //^****************client**********************
-
     //v****************client**********************
         /* Send the string to the server */
         // if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
         //            &c_echoServAddr, sizeof(c_echoServAddr)) != c_echoStringLen)
         //     DieWithError("2sendto() sent a different number of bytes than expected");
         //^****************client**********************
-
-
     // /* Create socket for sending/receiving datagrams */
     if ((s_sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
         DieWithError("socket() failed");
@@ -148,6 +143,7 @@ int main(int argc, char *argv[])
                 printf("\nSetting alarm within errno if");
                 alarm(TIMEOUT_SECS);
             }
+        printf("Handled client %s\n", inet_ntoa(s_echoClntAddr.sin_addr));
     }
     /* NOT REACHED */
 }
