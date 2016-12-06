@@ -116,7 +116,10 @@ int main(int argc, char *argv[])
     /* null-terminate the received data */
     echoBuffer[respStringLen] = '\0';
     printf("Received: %s\n", echoBuffer);    /* Print the received data */
-
+    struct Message converted;
+    converted = (struct Message) echoBuffer;
+    printf("%d",converted.a);
+    printf("%d",converted.b);
     
     close(sock);
     exit(0);
