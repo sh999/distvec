@@ -191,8 +191,8 @@ int main(int argc, char *argv[])
                     printf("\nAttempting to send my message...");
                     // printf("\n#Number of neighbors:%d",parsed_config.num_rows);
                     for(int i = 0; i < parsed_config.num_rows; i++){
-                        if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
-                            &all_addresses[i], sizeof(all_addresses[i])) != c_echoStringLen)
+                        if (sendto(c_sock, &msg, sizeof(msg), 0, (struct sockaddr *)
+                            &all_addresses[i], sizeof(all_addresses[i])) != sizeof(msg))
                             DieWithError("sendto() sent a different number of bytes than expected");
                     }
                     if (argc == 5){
