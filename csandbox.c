@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
                 if (errno == EINTR){
                     printf("\nAttempting to send my message...");
                     if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
-                        &c_echoServAddr, sizeof(c_echoServAddr)) != c_echoStringLen)
+                        &all_addresses[0], sizeof(all_addresses[0])) != c_echoStringLen)
                         DieWithError("sendto() sent a different number of bytes than expected");
                     if (argc == 5){
                         printf("\nSending message to different port...");
@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
         else{
             printf("\nForce sending message...");
             if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
-                &c_echoServAddr, sizeof(c_echoServAddr)) != c_echoStringLen)
+                &all_addresses[0], sizeof(all_addresses[0])) != c_echoStringLen)
                 DieWithError("sendto() sent a different number of bytes than expected");
             if (argc == 5){
                 printf("\nForce sending message to different port...");
