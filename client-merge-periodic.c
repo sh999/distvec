@@ -141,6 +141,7 @@ int main(int argc, char *argv[])
                 alarm(TIMEOUT_SECS);
             }
         printf("\nGot message from %s", inet_ntoa(s_echoClntAddr.sin_addr));
+        printf("\nMessage:%s",s_echoBuffer);
     }
     /* NOT REACHED */
 }
