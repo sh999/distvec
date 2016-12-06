@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
      // Bind to the local address 
     if (bind(s_sock, (struct sockaddr *) &s_echoServAddr, sizeof(s_echoServAddr)) < 0)
         DieWithError("bind() failed");
-  
+    int counter = 0;
     for (;;) /* Run forever */
     {
         /* Set the size of the in-out parameter */
@@ -130,18 +130,28 @@ int main(int argc, char *argv[])
         alarm(TIMEOUT_SECS);
         /* Block until receive message from a client */
         printf("\nWaiting for other messages...");
-        while ((s_recvMsgSize = recvfrom(s_sock, s_echoBuffer, ECHOMAX, 0,
-            (struct sockaddr *) &s_echoClntAddr, &s_cliAddrLen)) < 0)
-            if (errno == EINTR){
-                printf("\nAttempting to send my message...");
-                if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
-                           &c_echoServAddr, sizeof(c_echoServAddr)) != c_echoStringLen)
-                    DieWithError("sendto() sent a different number of bytes than expected");
-                // printf("\nSetting alarm within errno if");
-                alarm(TIMEOUT_SECS);
-            }
-        printf("\nGot message from %s", inet_ntoa(s_echoClntAddr.sin_addr));
-        printf("\nMessage:%s",s_echoBuffer);
+        printf("\nCounter:%d",counter);
+        if(counter % 5 != 0){
+            while ((s_recvMsgSize = recvfrom(s_sock, s_echoBuffer, ECHOMAX, 0,
+                (struct sockaddr *) &s_echoClntAddr, &s_cliAddrLen)) < 0)
+                if (errno == EINTR){
+                    printf("\nAttempting to send my message...");
+                    if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
+                        &c_echoServAddr, sizeof(c_echoServAddr)) != c_echoStringLen)
+                        DieWithError("sendto() sent a different number of bytes than expected");
+                    // printf("\nSetting alarm within errno if");
+                    alarm(TIMEOUT_SECS);
+                }
+            printf("\nGot message from %s", inet_ntoa(s_echoClntAddr.sin_addr));
+            printf("\nMessage:%s",s_echoBuffer);
+        }
+        else{
+            printf("\nForce sending message...");
+            if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
+                &c_echoServAddr, sizeof(c_echoServAddr)) != c_echoStringLen)
+                DieWithError("sendto() sent a different number of bytes than expected");
+        }
+        counter++;
     }
     /* NOT REACHED */
 }
