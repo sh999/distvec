@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     //     fprintf(stderr,"Usage:  %s <UDP SERVER PORT>\n", argv[0]);
     //     exit(1);
     // }
-    if ((argc < 3) || (argc > 4))    /* Test for correct number of arguments */
+    if ((argc < 3) || (argc > 5))    /* Test for correct number of arguments */
     {
         fprintf(stderr,"Usage: %s <Server IP> <Echo Word> [<Echo Port>]\n", argv[0]);
         exit(1);
@@ -80,7 +80,19 @@ int main(int argc, char *argv[])
         c_echoServPort = atoi(argv[3]);  /* Use given port, if any */
     else
         c_echoServPort = 7;  /* 7 is well-known port for echo service */
-
+    
+    // Trying to have client socket to two diff addresses
+    struct sockaddr_in c_echoServAddr2; /* Echo server address */
+    unsigned short c_echoServPort2;     /* Echo server port */
+    // char *c_servIP2;
+    if (argc == 5){
+        c_echoServPort = atoi(argv[3]);  /* Use given port, if any */
+        c_echoServPort2 = atoi(argv[4]);
+    }
+    memset(&c_echoServAddr2, 0, sizeof(c_echoServAddr2));    /* Zero out structure */
+    c_echoServAddr2.sin_family = AF_INET;
+    c_echoServAddr2.sin_addr.s_addr = inet_addr(c_servIP);  /* Server IP address */
+    c_echoServAddr2.sin_port = htons(c_echoServPort2);       /* Server port */
     // Mine
     // c_echoServPort = 90210;  // Hard code what this program will send to
 
@@ -139,6 +151,12 @@ int main(int argc, char *argv[])
                     if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
                         &c_echoServAddr, sizeof(c_echoServAddr)) != c_echoStringLen)
                         DieWithError("sendto() sent a different number of bytes than expected");
+                    if (argc == 5){
+                        printf("\nSending message to different port...");
+                        if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
+                        &c_echoServAddr2, sizeof(c_echoServAddr2)) != c_echoStringLen)
+                        DieWithError("sendto() sent a different number of bytes than expected");
+                    }
                     // printf("\nSetting alarm within errno if");
                     alarm(TIMEOUT_SECS);
                 }
