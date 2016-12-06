@@ -37,7 +37,8 @@ void CatchAlarm(int ignored);            /* Handler for SIGALRM */
 //*****************client**********************
 void DieWithError(char *errorMessage);  /* External error handling function */
 struct Parsed_config parse_config();
-
+void disp_routing_table (struct Routing_table rt);
+struct Routing_table create_rt_from_parsed();
 int main(int argc, char *argv[])
 {
     struct Parsed_config parsed_config;
@@ -49,6 +50,10 @@ int main(int argc, char *argv[])
         printf("Neighbor #%d :\t%s\tDist:%s\tAddress:%s\n",i,parsed_config.element[i].node,parsed_config.element[i].dist,parsed_config.element[i].address);
     }
     printf("\n---------------------------------");
+
+    struct Routing_table rt;
+    rt = create_rt_from_parsed(parsed_config);
+    disp_routing_table(rt);
 
     int s_sock;                        /* Socket */
     struct sockaddr_in s_echoServAddr; /* Local address */

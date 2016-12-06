@@ -79,3 +79,34 @@ struct Parsed_config parse_config(){
     printf("\nEND");
     return parsed_config;
 }
+
+void disp_routing_table (struct Routing_table rt) {
+    printf("\n--------------------");
+    printf("\nRouting table of %s",rt.node);
+    printf("\nNode\tDist\tNextHop");
+    for(int i = 0; i < rt.num_rows;i++){
+        printf("\n%s\t%d\t%s",rt.element[i].node, rt.element[i].dist, rt.element[i].next_hop);
+    }
+    printf("\n--------------------");
+}
+
+struct Routing_table create_rt_from_parsed(struct Parsed_config parsed_config){
+    /*
+        Parse config file into parsed_config struct
+        Use that struct to create rt table
+    */
+    // struct Parsed_config parsed_config;
+    // parsed_config = test_parse_config_to_struct();
+    struct Routing_table rt;
+    strcpy(rt.node,parsed_config.node);
+    rt.num_rows = parsed_config.num_rows;
+    for(int i = 0; i < rt.num_rows;i++){
+        strcpy(rt.element[i].node,parsed_config.element[i].node);
+        int num;
+        sscanf(parsed_config.element[i].dist,"%d",&num);
+        rt.element[i].dist = num;
+        strcpy(rt.element[i].next_hop, parsed_config.element[i].node); 
+    }
+    // disp_routing_table(rt);
+    return rt;
+}

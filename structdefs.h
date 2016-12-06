@@ -20,12 +20,12 @@ struct Distance_vector {
     struct DV_Element element[5];
 };
 struct RT_element {
-    char node;
+    char node[256];
     int dist;
-    char next_hop;
+    char next_hop[256];
 };
 struct Routing_table {
-    char node;
+    char node[256];
     int num_rows;
     struct RT_element element[6];
 };

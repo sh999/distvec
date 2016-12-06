@@ -17,13 +17,13 @@ struct Neighbor{
     char address[256];
 };
 struct DV_Element {
-    char dest;
+    char dest[256];
     int dist;
 };
 struct Distance_vector {
-    char sender;
+    char sender[256];
     int num_of_dests;
-    struct DV_Element element[5];
+    struct DV_Element element[256];
 };
 struct RT_element {
     char node[256];
@@ -47,10 +47,13 @@ struct Parsed_config {
     struct Config_element element[256];
 };
 void disp_distance_vector (struct Distance_vector dv) {
-    printf("\nDistance vector of %c:",dv.sender);
+    printf("\n--------------------");
+    printf("\nDistance vector of %s",dv.sender);
+    printf("\nNode\tDist");
     for(int i = 0; i < dv.num_of_dests;i++){
-        printf("\n%c\t%d",dv.element[i].dest, dv.element[i].dist);
+        printf("\n%s\t%d",dv.element[i].dest, dv.element[i].dist);
     }
+    printf("\n--------------------");
 }
 
 void disp_routing_table (struct Routing_table rt) {
@@ -307,11 +310,12 @@ struct Distance_vector test_create_dv(){
         Test creation of distance vector
     */
     struct Distance_vector dv_incoming;
-    dv_incoming.sender = 'B';
+    strcpy(dv_incoming.sender,"A");
+    dv_incoming.sender[255] = '\0';
     dv_incoming.num_of_dests = 2;
-    dv_incoming.element[0].dest = 'E';
+    strcpy(dv_incoming.element[0].dest,"E");
     dv_incoming.element[0].dist = 3;
-    dv_incoming.element[1].dest = 'F';
+    strcpy(dv_incoming.element[0].dest,"F");
     dv_incoming.element[1].dist = 2;
     disp_distance_vector(dv_incoming);
     return dv_incoming;
@@ -347,6 +351,7 @@ void test_update_routing(){
         In here, the creation of the 2 objects are coded and not from a config file
         In real program, dv comes from another node and rt comes from init config file
     */
+        printf("\nIn test update_routing");
     struct Distance_vector dv;
     struct Routing_table rt;
     dv = test_create_dv();
@@ -458,6 +463,31 @@ struct Routing_table test_create_rt_from_parsed(){
     return rt;
 }
 
+struct Distance_vector test_create_dv_from_rt(){
+    
+    // struct DV_Element {
+    //     char dest[256];
+    //     int dist;
+    // };
+    // struct Distance_vector {
+    //     char sender[256];
+    //     int num_of_dests;
+    //     struct DV_Element element[256];
+
+
+    struct Distance_vector dv;
+    struct Routing_table rt;
+    rt = test_create_rt_from_parsed();
+    disp_routing_table(rt);
+    strcpy(dv.sender,rt.node);
+    for(int i = 0; i < rt.num_rows; i++){
+        dv.num_of_dests = rt.num_rows;
+        strcpy(dv.element[i].dest,rt.element[i].node);
+        dv.element[i].dist = rt.element[i].dist;
+    }
+    return dv;
+}
+
 int main(void){
     // test_config();
     // test_token();
@@ -469,8 +499,10 @@ int main(void){
     // test_parse_config_to_struct();
     // struct Parsed_config parsed_config;
     // parsed_config = test_parse_config_to_struct();
-    test_create_rt_from_parsed();
-
-    printf("\npass");
+    // test_create_rt_from_parsed();
+    struct Distance_vector dv;
+    dv = test_create_dv_from_rt();
+    disp_distance_vector(dv);
+    printf("\nReturned with no errors");
 
 }
