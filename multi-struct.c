@@ -75,11 +75,11 @@ int main(int argc, char *argv[])
     //     fprintf(stderr,"Usage:  %s <UDP SERVER PORT>\n", argv[0]);
     //     exit(1);
     // }
-    if ((argc < 3) || (argc > 4))    /* Test for correct number of arguments */
-    {
-        fprintf(stderr,"Usage: %s <Server IP> <Echo Word> [<Echo Port>]\n", argv[0]);
-        exit(1);
-    }
+    // if ((argc < 3) || (argc > 4))    /* Test for correct number of arguments */
+    // {
+    //     fprintf(stderr,"Usage: %s <Server IP> <Echo Word> [<Echo Port>]\n", argv[0]);
+    //     exit(1);
+    // }
     // From the server
     // s_echoServPort = atoi(argv[1]);  /* First arg:  local port */
     s_echoServPort = 90210;  // Hard code what port I will get from
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
         c_echoServPort = 7;  /* 7 is well-known port for echo service */
     
     // Trying to have client socket to two diff addresses
-    struct sockaddr_in c_echoServAddr2; /* Echo server address */
+    // struct sockaddr_in c_echoServAddr2; /* Echo server address */
     // unsigned short c_echoServPort2;     /* Echo server port */
     char *c_servIP2;
     if (argc == 5){
@@ -108,10 +108,10 @@ int main(int argc, char *argv[])
         // c_echoServPort2 = atoi(argv[4]);
         c_servIP2 = argv[4];            // For extra client socket
     }
-    memset(&c_echoServAddr2, 0, sizeof(c_echoServAddr2));    /* Zero out structure */
-    c_echoServAddr2.sin_family = AF_INET;
-    c_echoServAddr2.sin_addr.s_addr = inet_addr(c_servIP2);  /* Server IP address */
-    c_echoServAddr2.sin_port = htons(c_echoServPort);       /* Server port */
+    // memset(&c_echoServAddr2, 0, sizeof(c_echoServAddr2));    /* Zero out structure */
+    // c_echoServAddr2.sin_family = AF_INET;
+    // c_echoServAddr2.sin_addr.s_addr = inet_addr(c_servIP2);  /* Server IP address */
+    // c_echoServAddr2.sin_port = htons(c_echoServPort);       /* Server port */
     // Mine
     // c_echoServPort = 90210;  // Hard code what this program will send to
 
@@ -172,8 +172,8 @@ int main(int argc, char *argv[])
                         DieWithError("sendto() sent a different number of bytes than expected");
                     if (argc == 5){
                         printf("\nSending message to different port...");
-                        if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
-                        &c_echoServAddr2, sizeof(c_echoServAddr2)) != c_echoStringLen)
+                        // if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
+                        // &c_echoServAddr2, sizeof(c_echoServAddr2)) != c_echoStringLen)
                         DieWithError("sendto() sent a different number of bytes than expected");
                     }
                     // printf("\nSetting alarm within errno if");
@@ -189,8 +189,8 @@ int main(int argc, char *argv[])
                 DieWithError("sendto() sent a different number of bytes than expected");
             if (argc == 5){
                 printf("\nForce sending message to different port...");
-                if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
-                &c_echoServAddr2, sizeof(c_echoServAddr2)) != c_echoStringLen)
+                // if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
+                // &c_echoServAddr2, sizeof(c_echoServAddr2)) != c_echoStringLen)
                 DieWithError("sendto() sent a different number of bytes than expected");
             }
         }
