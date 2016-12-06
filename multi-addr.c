@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     // From the server
     // s_echoServPort = atoi(argv[1]);  /* First arg:  local port */
     s_echoServPort = 90210;  // Hard code what port I will get from
-
+    c_echoServPort = 90210;
 //v****************client**********************
     // c_servIP = argv[1];           /* First arg:  server IP address (dotted quad) */
     // c_echoString = argv[2];       /* Second arg: string to echo */
