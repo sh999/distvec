@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
                 (struct sockaddr *) &s_echoClntAddr, &s_cliAddrLen)) < 0)
                 if (errno == EINTR){
                     printf("\nAttempting to send my message...");
-                    printf("\n#Number of neighbors:%s",parsed_config.num_rows);
+                    printf("\n#Number of neighbors:%d",parsed_config.num_rows);
                     for(int i = 0; i < parsed_config.num_rows; i++){
                         if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
                             &all_addresses[i], sizeof(all_addresses[i])) != c_echoStringLen)
