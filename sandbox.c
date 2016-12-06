@@ -351,7 +351,7 @@ void test_update_routing(){
     update_routing(dv,rt);
 }
 
-void test_routing_table_from_config(){
+struct Parsed_config test_routing_table_from_config(){
     /*
         Read config file to create initial routing table
     */
@@ -364,7 +364,6 @@ void test_routing_table_from_config(){
     // struct My_node my_node;
     // struct Neighbor n1;
     struct Parsed_config parsed_config;
-
 
     fp = fopen("./neighbor_config", "r");
     if (fp == NULL)
@@ -428,6 +427,8 @@ void test_routing_table_from_config(){
     fclose(fp);
     if (line)
         free(line);
+    printf("\nEND");
+    return parsed_config;
 }
 int main(void){
     // test_config();
@@ -437,6 +438,9 @@ int main(void){
     // test_create_dv();
     // test_create_rt();
     // test_update_routing();
-    test_routing_table_from_config();
+    // test_routing_table_from_config();
+    struct Parsed_config parsed_config;
+    parsed_config = test_routing_table_from_config();
+    printf("\npass");
 
 }

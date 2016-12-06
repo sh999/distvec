@@ -18,7 +18,7 @@ client will send msgX, and both3 will get msgX, then will forward msgX to server
 #include <stdlib.h>     /* for atoi() and exit() */
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
-
+#include "structdefs.h" // routing table structs
 
 //*****************client**********************
 #include <errno.h>      /* for errno and EINTR */
@@ -31,13 +31,23 @@ client will send msgX, and both3 will get msgX, then will forward msgX to server
 int tries=0;   /* Count of times sent - GLOBAL for signal-handler access */
 void CatchAlarm(int ignored);            /* Handler for SIGALRM */
 
+
 //*****************client**********************
-
-
 void DieWithError(char *errorMessage);  /* External error handling function */
+struct Parsed_config get_routing_table_from_config();
 
 int main(int argc, char *argv[])
 {
+    struct Parsed_config parsed_config;
+    parsed_config = get_routing_table_from_config();
+    printf("\n--------Config Properties--------");
+    printf("\nMy node name:%s",parsed_config.node);
+    printf("\nMy port:%s",parsed_config.port);
+    for(int i = 0; i < parsed_config.num_rows; i++){
+        printf("Neighbor #%d :\t%s\tDist:%s\tAddress:%s\n",i,parsed_config.element[i].node,parsed_config.element[i].dist,parsed_config.element[i].address);
+    }
+    printf("\n---------------------------------");
+
     int s_sock;                        /* Socket */
     struct sockaddr_in s_echoServAddr; /* Local address */
     struct sockaddr_in s_echoClntAddr; /* Client address */
@@ -65,7 +75,7 @@ int main(int argc, char *argv[])
     //     fprintf(stderr,"Usage:  %s <UDP SERVER PORT>\n", argv[0]);
     //     exit(1);
     // }
-    if ((argc < 3) || (argc > 5))    /* Test for correct number of arguments */
+    if ((argc < 3) || (argc > 4))    /* Test for correct number of arguments */
     {
         fprintf(stderr,"Usage: %s <Server IP> <Echo Word> [<Echo Port>]\n", argv[0]);
         exit(1);
@@ -75,8 +85,11 @@ int main(int argc, char *argv[])
     s_echoServPort = 90210;  // Hard code what port I will get from
 
 //v****************client**********************
-    c_servIP = argv[1];           /* First arg:  server IP address (dotted quad) */
-    c_echoString = argv[2];       /* Second arg: string to echo */
+    // c_servIP = argv[1];           /* First arg:  server IP address (dotted quad) */
+    // c_echoString = argv[2];       /* Second arg: string to echo */
+    
+    c_servIP = parsed_config.element[0].address;  //SH: set client IP based on parsed config neighbor value
+    c_echoString = parsed_config.node;
 
     if ((c_echoStringLen = strlen(c_echoString)) > ECHOMAX)
         DieWithError("Echo word too long");
@@ -148,7 +161,7 @@ int main(int argc, char *argv[])
         alarm(TIMEOUT_SECS);
         /* Block until receive message from a client */
         printf("\nWaiting for other messages...");
-        printf("\nCounter:%d",counter);
+        printf("\n\nCounter:%d",counter);
         if(counter % 5 != 0){
             while ((s_recvMsgSize = recvfrom(s_sock, s_echoBuffer, ECHOMAX, 0,
                 (struct sockaddr *) &s_echoClntAddr, &s_cliAddrLen)) < 0)
