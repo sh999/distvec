@@ -27,7 +27,7 @@ client will send msgX, and both3 will get msgX, then will forward msgX to server
 #include <signal.h>     /* for sigaction() */
 
 #define ECHOMAX         255     /* Longest string to echo */
-#define TIMEOUT_SECS    2       /* Seconds between retransmits */
+#define TIMEOUT_SECS    5       /* Seconds between retransmits */
 #define MAXTRIES        5       /* Tries before giving up */
 
 int tries=0;   /* Count of times sent - GLOBAL for signal-handler access */
@@ -174,6 +174,7 @@ int main(int argc, char *argv[])
     struct Message msg;
     msg.a = 33;
     msg.b = 44;
+    struct Message * recmsg;
     for (;;) /* Run forever */
     {
         /* Set the size of the in-out parameter */
@@ -183,7 +184,7 @@ int main(int argc, char *argv[])
         printf("\nWaiting for other messages...");
         printf("\n\nCounter:%d",counter);
         if(counter % 5 != 0){
-            while ((s_recvMsgSize = recvfrom(s_sock, s_echoBuffer, ECHOMAX, 0,
+            while ((s_recvMsgSize = recvfrom(s_sock, (struct Message*) recmsg, ECHOMAX, 0,
                 (struct sockaddr *) &s_echoClntAddr, &s_cliAddrLen)) < 0)
                 if (errno == EINTR){
                     printf("\nAttempting to send my message...");
