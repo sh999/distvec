@@ -36,12 +36,12 @@ void CatchAlarm(int ignored);            /* Handler for SIGALRM */
 
 //*****************client**********************
 void DieWithError(char *errorMessage);  /* External error handling function */
-struct Parsed_config get_routing_table_from_config();
+struct Parsed_config parse_config();
 
 int main(int argc, char *argv[])
 {
     struct Parsed_config parsed_config;
-    parsed_config = get_routing_table_from_config();
+    parsed_config = parse_config();
     printf("\n--------Config Properties--------");
     printf("\nMy node name:%s",parsed_config.node);
     printf("\nMy port:%s",parsed_config.port);

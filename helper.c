@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include "structdefs.h"
-struct Parsed_config get_routing_table_from_config(){
+struct Parsed_config parse_config(){
     /*
         Read config file to create initial routing table
     */
@@ -68,7 +68,7 @@ struct Parsed_config get_routing_table_from_config(){
        line_num++;
     }
    parsed_config.num_rows = line_num-3;
-   
+
    printf("\nLines:%d",parsed_config.num_rows);
     
     

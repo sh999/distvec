@@ -26,14 +26,14 @@ struct Distance_vector {
     struct DV_Element element[5];
 };
 struct RT_element {
-    char node;
+    char node[256];
     int dist;
-    char next_hop;
+    char next_hop[256];
 };
 struct Routing_table {
-    char node;
+    char node[256];
     int num_rows;
-    struct RT_element element[6];
+    struct RT_element element[256];
 };
 struct Config_element {
     char node[256];
@@ -54,36 +54,39 @@ void disp_distance_vector (struct Distance_vector dv) {
 }
 
 void disp_routing_table (struct Routing_table rt) {
-    printf("\nRouting table of %c:",rt.node);
+    printf("\n--------------------");
+    printf("\nRouting table of %s",rt.node);
+    printf("\nNode\tDist\tNextHop");
     for(int i = 0; i < rt.num_rows;i++){
-        printf("\n%c\t%d\t%c",rt.element[i].node, rt.element[i].dist, rt.element[i].next_hop);
+        printf("\n%s\t%d\t%s",rt.element[i].node, rt.element[i].dist, rt.element[i].next_hop);
     }
+    printf("\n--------------------");
 }
 void update_routing(struct Distance_vector dv, struct Routing_table rt){
-    printf("\nUpdating routing");
-    for(int i = 0; i < rt.num_rows;i++){
-        // printf("\n%c\t%d\t%c",rt.element[i].node, rt.element[i].dist, rt.element[i].next_hop);
-        for(int j = 0; j < dv.num_of_dests; j++){
-            printf("\nChecking if %c matches %c ",rt.element[i].node,dv.element[j].dest);
-            if(rt.element[i].node==dv.element[j].dest){
-                printf("\tMatch");
-                printf("\nrt dist:%d\tdv dist:%d",rt.element[i].dist , dv.element[j].dist);
-                if(dv.element[j].dist<rt.element[i].dist){
-                    printf("\nDecreasing distance");
-                    rt.element[i].dist = dv.element[j].dist;
-                }
-                else{
-                    printf("\nNot decreasing distance");
-                }
-                break;
-            }
-            else{
-                printf("\tNo match");
-            }
-        }
-    }
-    printf("\nAfter updating:");
-    disp_routing_table(rt);
+//     printf("\nUpdating routing");
+//     for(int i = 0; i < rt.num_rows;i++){
+//         // printf("\n%c\t%d\t%c",rt.element[i].node, rt.element[i].dist, rt.element[i].next_hop);
+//         for(int j = 0; j < dv.num_of_dests; j++){
+//             printf("\nChecking if %c matches %c ",rt.element[i].node,dv.element[j].dest);
+//             if(rt.element[i].node==dv.element[j].dest){ // Broken due to data change
+//                 printf("\tMatch");
+//                 printf("\nrt dist:%d\tdv dist:%d",rt.element[i].dist , dv.element[j].dist);
+//                 if(dv.element[j].dist<rt.element[i].dist){
+//                     printf("\nDecreasing distance");
+//                     rt.element[i].dist = dv.element[j].dist;
+//                 }
+//                 else{
+//                     printf("\nNot decreasing distance");
+//                 }
+//                 break;
+//             }
+//             else{
+//                 printf("\tNo match");
+//             }
+//         }
+//     }
+//     printf("\nAfter updating:");
+//     disp_routing_table(rt);
 }
 
 int test_config()
@@ -318,22 +321,24 @@ struct Routing_table test_create_rt(){
         Test creation of routing table
 
     */
-    struct Distance_vector dv_incoming;
-    struct Routing_table rt;
-    rt.node = 'A';
-    rt.num_rows = 3;
-    rt.element[0].node = 'E';
-    rt.element[0].dist = 9;
-    rt.element[0].next_hop = 'B';
-    rt.element[1].node = 'F';
-    rt.element[1].dist = 9;
-    rt.element[1].next_hop = 'B';
-    rt.element[2].node = 'C';
-    rt.element[2].dist = 2;
-    rt.element[2].next_hop = 'B';
-    disp_routing_table(rt);
-    return rt;
+    // struct Distance_vector dv_incoming;
+    // struct Routing_table rt;
+    // rt.node = 'A';
+    // rt.num_rows = 3;
+    // rt.element[0].node = 'E';
+    // rt.element[0].dist = 9;
+    // rt.element[0].next_hop = 'B';
+    // rt.element[1].node = 'F';
+    // rt.element[1].dist = 9;
+    // rt.element[1].next_hop = 'B';
+    // rt.element[2].node = 'C';
+    // rt.element[2].dist = 2;
+    // rt.element[2].next_hop = 'B';
+    // disp_routing_table(rt);
+    // return rt;
 }
+
+
 
 void test_update_routing(){
     /*
@@ -349,9 +354,10 @@ void test_update_routing(){
     // disp_distance_vector(dv);
     // disp_routing_table(rt);
     update_routing(dv,rt);
+
 }
 
-struct Parsed_config test_routing_table_from_config(){
+struct Parsed_config test_parse_config_to_struct(){
     /*
         Read config file to create initial routing table
     */
@@ -430,6 +436,28 @@ struct Parsed_config test_routing_table_from_config(){
     printf("\nEND");
     return parsed_config;
 }
+
+struct Routing_table test_create_rt_from_parsed(){
+    /*
+        Parse config file into parsed_config struct
+        Use that struct to create rt table
+    */
+    struct Parsed_config parsed_config;
+    parsed_config = test_parse_config_to_struct();
+    struct Routing_table rt;
+    strcpy(rt.node,parsed_config.node);
+    rt.num_rows = parsed_config.num_rows;
+    for(int i = 0; i < rt.num_rows;i++){
+        strcpy(rt.element[i].node,parsed_config.element[i].node);
+        int num;
+        sscanf(parsed_config.element[i].dist,"%d",&num);
+        rt.element[i].dist = num;
+        strcpy(rt.element[i].next_hop, parsed_config.element[i].node); 
+    }
+    disp_routing_table(rt);
+    return rt;
+}
+
 int main(void){
     // test_config();
     // test_token();
@@ -438,9 +466,11 @@ int main(void){
     // test_create_dv();
     // test_create_rt();
     // test_update_routing();
-    // test_routing_table_from_config();
-    struct Parsed_config parsed_config;
-    parsed_config = test_routing_table_from_config();
+    // test_parse_config_to_struct();
+    // struct Parsed_config parsed_config;
+    // parsed_config = test_parse_config_to_struct();
+    test_create_rt_from_parsed();
+
     printf("\npass");
 
 }
