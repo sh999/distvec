@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
     memset(&c_echoServAddr2, 0, sizeof(c_echoServAddr2));    /* Zero out structure */
     c_echoServAddr2.sin_family = AF_INET;
     c_echoServAddr2.sin_addr.s_addr = inet_addr(c_servIP2);  /* Server IP address */
-    c_echoServAddr2.sin_port = htons(c_echoServPort2);       /* Server port */
+    c_echoServAddr2.sin_port = htons(c_echoServPort);       /* Server port */
     // Mine
     // c_echoServPort = 90210;  // Hard code what this program will send to
 
