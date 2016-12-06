@@ -38,7 +38,9 @@ void CatchAlarm(int ignored);            /* Handler for SIGALRM */
 void DieWithError(char *errorMessage);  /* External error handling function */
 struct Parsed_config parse_config();
 void disp_routing_table (struct Routing_table rt);
-struct Routing_table create_rt_from_parsed();
+void disp_distance_vector (struct Distance_vector dv);
+struct Distance_vector create_dv_from_rt(struct Routing_table rt);
+struct Routing_table create_rt_from_parsed(struct Parsed_config parsed_config);
 int main(int argc, char *argv[])
 {
     struct Parsed_config parsed_config;
@@ -54,6 +56,10 @@ int main(int argc, char *argv[])
     struct Routing_table rt;
     rt = create_rt_from_parsed(parsed_config);
     disp_routing_table(rt);
+
+    struct Distance_vector dv;
+    dv = create_dv_from_rt(rt);
+    disp_distance_vector(dv);
 
     int s_sock;                        /* Socket */
     struct sockaddr_in s_echoServAddr; /* Local address */

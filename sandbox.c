@@ -464,17 +464,6 @@ struct Routing_table test_create_rt_from_parsed(){
 }
 
 struct Distance_vector test_create_dv_from_rt(){
-    
-    // struct DV_Element {
-    //     char dest[256];
-    //     int dist;
-    // };
-    // struct Distance_vector {
-    //     char sender[256];
-    //     int num_of_dests;
-    //     struct DV_Element element[256];
-
-
     struct Distance_vector dv;
     struct Routing_table rt;
     rt = test_create_rt_from_parsed();

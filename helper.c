@@ -90,6 +90,17 @@ void disp_routing_table (struct Routing_table rt) {
     printf("\n--------------------");
 }
 
+void disp_distance_vector (struct Distance_vector dv) {
+    printf("\n--------------------");
+    printf("\nDistance vector of %s",dv.sender);
+    printf("\nNode\tDist");
+    for(int i = 0; i < dv.num_of_dests;i++){
+        printf("\n%s\t%d",dv.element[i].dest, dv.element[i].dist);
+    }
+    printf("\n--------------------");
+}
+
+
 struct Routing_table create_rt_from_parsed(struct Parsed_config parsed_config){
     /*
         Parse config file into parsed_config struct
@@ -109,4 +120,18 @@ struct Routing_table create_rt_from_parsed(struct Parsed_config parsed_config){
     }
     // disp_routing_table(rt);
     return rt;
+}
+
+struct Distance_vector create_dv_from_rt(struct Routing_table rt){
+    struct Distance_vector dv;
+    // struct Routing_table rt;
+    // rt = test_create_rt_from_parsed();
+    // disp_routing_table(rt);
+    strcpy(dv.sender,rt.node);
+    for(int i = 0; i < rt.num_rows; i++){
+        dv.num_of_dests = rt.num_rows;
+        strcpy(dv.element[i].dest,rt.element[i].node);
+        dv.element[i].dist = rt.element[i].dist;
+    }
+    return dv;
 }

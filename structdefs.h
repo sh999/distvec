@@ -11,13 +11,13 @@ struct Neighbor{
     char address[256];
 };
 struct DV_Element {
-    char dest;
+    char dest[256];
     int dist;
 };
 struct Distance_vector {
-    char sender;
+    char sender[256];
     int num_of_dests;
-    struct DV_Element element[5];
+    struct DV_Element element[256];
 };
 struct RT_element {
     char node[256];
@@ -27,7 +27,7 @@ struct RT_element {
 struct Routing_table {
     char node[256];
     int num_rows;
-    struct RT_element element[6];
+    struct RT_element element[256];
 };
 struct Config_element {
     char node[256];
