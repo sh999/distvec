@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
         c_echoServPort = 7;  /* 7 is well-known port for echo service */
 
     // Mine
-    c_echoServPort = 90210;  // Hard code what this program will send to
+    // c_echoServPort = 90210;  // Hard code what this program will send to
 
     /* Create a best-effort datagram socket using UDP */
     if ((c_sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
@@ -129,21 +129,18 @@ int main(int argc, char *argv[])
         s_cliAddrLen = sizeof(s_echoClntAddr);
         alarm(TIMEOUT_SECS);
         /* Block until receive message from a client */
-        printf("\nBefore while");
+        printf("\nWaiting for other messages...");
         while ((s_recvMsgSize = recvfrom(s_sock, s_echoBuffer, ECHOMAX, 0,
             (struct sockaddr *) &s_echoClntAddr, &s_cliAddrLen)) < 0)
             if (errno == EINTR){
-                printf("\nNothing happened after waiting");
+                printf("\nAttempting to send my message...");
                 if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
                            &c_echoServAddr, sizeof(c_echoServAddr)) != c_echoStringLen)
-                    DieWithError("2sendto() sent a different number of bytes than expected");
-                else{
-                    printf("\nSending message from client?:%s",s_echoBuffer);
-                }
-                printf("\nSetting alarm within errno if");
+                    DieWithError("sendto() sent a different number of bytes than expected");
+                // printf("\nSetting alarm within errno if");
                 alarm(TIMEOUT_SECS);
             }
-        printf("Handled client %s\n", inet_ntoa(s_echoClntAddr.sin_addr));
+        printf("\nGot message from %s", inet_ntoa(s_echoClntAddr.sin_addr));
     }
     /* NOT REACHED */
 }
