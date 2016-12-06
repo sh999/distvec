@@ -1,5 +1,5 @@
-// An attempt at making periodic send while listening
-// Doesn't work so far
+// Merged server.c and client.c so this prog can listen and send
+// This sort of works
 /*
 To test:
 Run a server program listening on 90211
@@ -7,8 +7,6 @@ Run a client program sending to 90210
 Run this both program, which listens on 90210 and will send to 90211
 client will send msgX, and both3 will get msgX, then will forward msgX to server
 */
-#include <sys/time.h>
-
 #include <stdio.h>      /* for printf() and fprintf() */
 #include <sys/socket.h> /* for socket() and bind() */
 #include <arpa/inet.h>  /* for sockaddr_in and inet_ntoa() */
@@ -22,8 +20,8 @@ client will send msgX, and both3 will get msgX, then will forward msgX to server
 #include <signal.h>     /* for sigaction() */
 
 #define ECHOMAX         255     /* Longest string to echo */
-#define TIMEOUT_SECS    10       /* Seconds between retransmits */
-#define MAXTRIES        99       /* Tries before giving up */
+#define TIMEOUT_SECS    2       /* Seconds between retransmits */
+#define MAXTRIES        5       /* Tries before giving up */
 
 int tries=0;   /* Count of times sent - GLOBAL for signal-handler access */
 void CatchAlarm(int ignored);            /* Handler for SIGALRM */
@@ -130,66 +128,26 @@ int main(int argc, char *argv[])
     if (bind(s_sock, (struct sockaddr *) &s_echoServAddr, sizeof(s_echoServAddr)) < 0)
         DieWithError("bind() failed");
   
-    struct timeval tv;
-    tv.tv_sec = 3;
-    tv.tv_usec = 0;
-    /* Set timeout recvm */
-    printf("\nBefore setsockopt");
-    if (setsockopt(s_sock, SOL_SOCKET, SO_RCVTIMEO,&tv,sizeof(tv)) < 0) {
-        perror("Error");
-    }
-    else{
-        printf("\nSuccess setsockopt");
-    }
     for (;;) /* Run forever */
     {
-        printf("\nIn for loop");
         /* Set the size of the in-out parameter */
         s_cliAddrLen = sizeof(s_echoClntAddr);
-
+        alarm(TIMEOUT_SECS);
         /* Block until receive message from a client */
-        // if ((s_recvMsgSize = recvfrom(s_sock, s_echoBuffer, ECHOMAX, 0,
-        //     (struct sockaddr *) &s_echoClntAddr, &s_cliAddrLen)) < 0)
-        //     DieWithError("recvfrom() failed");
-        if (recvfrom(s_sock, s_echoBuffer, ECHOMAX, 0,
-            (struct sockaddr *) &s_echoClntAddr, &s_cliAddrLen) < 0)
-            DieWithError("2recvfrom() failed");
-
-
-        // printf("Handling client %s\n", inet_ntoa(s_echoClntAddr.sin_addr));
-        // Host commented out
-        /* Send received datagram back to the client */
-        // if (sendto(s_sock, s_echoBuffer, s_recvMsgSize, 0, 
-             // (struct sockaddr *) &s_echoClntAddr, sizeof(s_echoClntAddr)) != s_recvMsgSize)
-            // DieWithError("sendto() sent a different number of bytes than expected");
-
-        //v****************client**********************
-        /* Send the string to the server */
-        // if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
-        //            &c_echoServAddr, sizeof(c_echoServAddr)) != c_echoStringLen)
-        //     DieWithError("2sendto() sent a different number of bytes than expected");
-        //^****************client**********************
-        // Alternative, passing msg from server buffer to client buffer out
-        // if (sendto(c_sock, s_echoBuffer, s_recvMsgSize, 0, 
-        //      (struct sockaddr *) &c_echoServAddr, sizeof(c_echoServAddr)) != s_recvMsgSize)
-        //     DieWithError("3sendto() sent a different number of bytes than expected");
-        // else{
-        //     printf("Sending message from client?:%s",s_echoBuffer);
-        // }
-        // while (1){      // Keep sending periodically indefinitely every 2 seconds
-            // sleep(5);   // Wait 2 seconds before sending again
-            // if (tries < MAXTRIES)      /* incremented by signal handler */
-            // {
-                // printf("\nSending periodic message...");
-                // // printf("timed out, %d more tries...\n", MAXTRIES-tries);
-                // if (sendto(c_sock, s_echoBuffer, s_recvMsgSize, 0, (struct sockaddr *)
-                //             &c_echoServAddr, sizeof(c_echoServAddr)) != s_recvMsgSize)
-                //     DieWithError("sendto() failed");
-            // } 
-            // else
-                // DieWithError("No Response");
-        // }
-        printf("\nout of while");
+        printf("\nBefore while");
+        while ((s_recvMsgSize = recvfrom(s_sock, s_echoBuffer, ECHOMAX, 0,
+            (struct sockaddr *) &s_echoClntAddr, &s_cliAddrLen)) < 0)
+            if (errno == EINTR){
+                printf("\nNothing happened after waiting");
+                if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
+                           &c_echoServAddr, sizeof(c_echoServAddr)) != c_echoStringLen)
+                    DieWithError("2sendto() sent a different number of bytes than expected");
+                else{
+                    printf("\nSending message from client?:%s",s_echoBuffer);
+                }
+                printf("\nSetting alarm within errno if");
+                alarm(TIMEOUT_SECS);
+            }
     }
     /* NOT REACHED */
 }

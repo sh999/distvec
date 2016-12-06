@@ -62,3 +62,13 @@ B		3  			B
 D 		5 			D
 E       5			B 			 
 F 		3			B
+
+===Timeout behavior==
+Wanted timeout behavior
+Setup listening socket and sending socket
+Loop start
+	Listen socket for 3 seconds
+	If don't hear anything, send what I have out
+	If I hear something within 3 seconds, immediately send
+Keep looping
+
