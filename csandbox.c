@@ -93,30 +93,24 @@ int main(int argc, char *argv[])
 
     if ((c_echoStringLen = strlen(c_echoString)) > ECHOMAX)
         DieWithError("Echo word too long");
-
-    if (argc == 4)
-        c_echoServPort = atoi(argv[3]);  /* Use given port, if any */
-    else
-        c_echoServPort = 7;  /* 7 is well-known port for echo service */
     
     // SH: Create array of addresses
-    struct sockaddr_in * adds[parsed_config.num_rows];
+    struct sockaddr_in all_addresses[parsed_config.num_rows];  //SH: addresses to create sockets from
     // Trying to have client socket to two diff addresses
     // struct sockaddr_in c_echoServAddr2; /* Echo server address */
     // unsigned short c_echoServPort2;     /* Echo server port */
     char *c_servIP2;
-    if (argc == 5){
-        c_echoServPort = atoi(argv[3]);  /* Use given port, if any */
-        // c_echoServPort2 = atoi(argv[4]);
-        c_servIP2 = argv[4];            // For extra client socket
-    }
     // memset(&c_echoServAddr2, 0, sizeof(c_echoServAddr2));    /* Zero out structure */
     // c_echoServAddr2.sin_family = AF_INET;
     // c_echoServAddr2.sin_addr.s_addr = inet_addr(c_servIP2);  /* Server IP address */
     // c_echoServAddr2.sin_port = htons(c_echoServPort);       /* Server port */
     // Mine
-    // c_echoServPort = 90210;  // Hard code what this program will send to
-
+    for(int i = 0; i < parsed_config.num_rows; i++){
+        memset(&all_addresses[i], 0, sizeof(all_addresses[i]));    /* Zero out structure */
+        all_addresses[i].sin_family = AF_INET;
+        all_addresses[i].sin_addr.s_addr = inet_addr(parsed_config.element[i].address);  /* Server IP address */
+        all_addresses[i].sin_port = htons(c_echoServPort);       /* Server port */
+    }
     /* Create a best-effort datagram socket using UDP */
     if ((c_sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
         DieWithError("socket() failed");
