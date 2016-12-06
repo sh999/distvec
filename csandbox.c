@@ -187,9 +187,14 @@ int main(int argc, char *argv[])
         }
         else{
             printf("\nForce sending message...");
-            if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
-                &all_addresses[0], sizeof(all_addresses[0])) != c_echoStringLen)
-                DieWithError("sendto() sent a different number of bytes than expected");
+            for(int i = 0; i < parsed_config.num_rows; i++){
+                        if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
+                            &all_addresses[i], sizeof(all_addresses[i])) != c_echoStringLen)
+                            DieWithError("sendto() sent a different number of bytes than expected");
+                    }
+            // if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
+            //     &all_addresses[0], sizeof(all_addresses[0])) != c_echoStringLen)
+            //     DieWithError("sendto() sent a different number of bytes than expected");
             if (argc == 5){
                 printf("\nForce sending message to different port...");
                 // if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
