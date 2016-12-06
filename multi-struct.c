@@ -94,10 +94,10 @@ int main(int argc, char *argv[])
     if ((c_echoStringLen = strlen(c_echoString)) > ECHOMAX)
         DieWithError("Echo word too long");
 
-    if (argc == 4)
-        c_echoServPort = atoi(argv[3]);  /* Use given port, if any */
-    else
-        c_echoServPort = 7;  /* 7 is well-known port for echo service */
+    // if (argc == 4)
+    //     c_echoServPort = atoi(argv[3]);   Use given port, if any 
+    // else
+    //     c_echoServPort = 7;  /* 7 is well-known port for echo service */
     
     // Trying to have client socket to two diff addresses
     // struct sockaddr_in c_echoServAddr2; /* Echo server address */

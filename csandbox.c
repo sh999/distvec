@@ -1,5 +1,10 @@
 // Merged server.c and client.c so this prog can listen and send
-// This sort of works
+// Based on client-merged-periodic.c
+// Based on multiclient.c
+// See if can send to multiple ip addresses (same port)
+// Cand send to multiple ip addresses as long as the node has received a msg
+// Otherwise will be stuck in listening loop
+// Working on if I can pass through structs finally
 /*
 To test:
 Run a server program listening on 90211
@@ -7,34 +12,42 @@ Run a client program sending to 90210
 Run this both program, which listens on 90210 and will send to 90211
 client will send msgX, and both3 will get msgX, then will forward msgX to server
 */
-#include <sys/time.h>
-
 #include <stdio.h>      /* for printf() and fprintf() */
 #include <sys/socket.h> /* for socket() and bind() */
 #include <arpa/inet.h>  /* for sockaddr_in and inet_ntoa() */
 #include <stdlib.h>     /* for atoi() and exit() */
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
-
+#include "structdefs.h" // routing table structs
 
 //*****************client**********************
 #include <errno.h>      /* for errno and EINTR */
 #include <signal.h>     /* for sigaction() */
 
 #define ECHOMAX         255     /* Longest string to echo */
-#define TIMEOUT_SECS    10       /* Seconds between retransmits */
-#define MAXTRIES        99       /* Tries before giving up */
+#define TIMEOUT_SECS    2       /* Seconds between retransmits */
+#define MAXTRIES        5       /* Tries before giving up */
 
 int tries=0;   /* Count of times sent - GLOBAL for signal-handler access */
 void CatchAlarm(int ignored);            /* Handler for SIGALRM */
 
+
 //*****************client**********************
-
-
 void DieWithError(char *errorMessage);  /* External error handling function */
+struct Parsed_config get_routing_table_from_config();
 
 int main(int argc, char *argv[])
 {
+    struct Parsed_config parsed_config;
+    parsed_config = get_routing_table_from_config();
+    printf("\n--------Config Properties--------");
+    printf("\nMy node name:%s",parsed_config.node);
+    printf("\nMy port:%s",parsed_config.port);
+    for(int i = 0; i < parsed_config.num_rows; i++){
+        printf("Neighbor #%d :\t%s\tDist:%s\tAddress:%s\n",i,parsed_config.element[i].node,parsed_config.element[i].dist,parsed_config.element[i].address);
+    }
+    printf("\n---------------------------------");
+
     int s_sock;                        /* Socket */
     struct sockaddr_in s_echoServAddr; /* Local address */
     struct sockaddr_in s_echoClntAddr; /* Client address */
@@ -56,26 +69,27 @@ int main(int argc, char *argv[])
     int c_echoStringLen;               /* Length of string to echo */
     int c_respStringLen;               /* Size of received datagram */
 //^****************client**********************
-
     // From the server
     // if (argc != 2)         /* Test for correct number of parameters */ 
     // {
     //     fprintf(stderr,"Usage:  %s <UDP SERVER PORT>\n", argv[0]);
     //     exit(1);
     // }
-    if ((argc < 3) || (argc > 4))    /* Test for correct number of arguments */
-    {
-        fprintf(stderr,"Usage: %s <Server IP> <Echo Word> [<Echo Port>]\n", argv[0]);
-        exit(1);
-    }
-
+    // if ((argc < 3) || (argc > 4))    /* Test for correct number of arguments */
+    // {
+    //     fprintf(stderr,"Usage: %s <Server IP> <Echo Word> [<Echo Port>]\n", argv[0]);
+    //     exit(1);
+    // }
     // From the server
     // s_echoServPort = atoi(argv[1]);  /* First arg:  local port */
     s_echoServPort = 90210;  // Hard code what port I will get from
 
 //v****************client**********************
-    c_servIP = argv[1];           /* First arg:  server IP address (dotted quad) */
-    c_echoString = argv[2];       /* Second arg: string to echo */
+    // c_servIP = argv[1];           /* First arg:  server IP address (dotted quad) */
+    // c_echoString = argv[2];       /* Second arg: string to echo */
+    
+    c_servIP = parsed_config.element[0].address;  //SH: set client IP based on parsed config neighbor value
+    c_echoString = parsed_config.node;
 
     if ((c_echoStringLen = strlen(c_echoString)) > ECHOMAX)
         DieWithError("Echo word too long");
@@ -84,9 +98,24 @@ int main(int argc, char *argv[])
         c_echoServPort = atoi(argv[3]);  /* Use given port, if any */
     else
         c_echoServPort = 7;  /* 7 is well-known port for echo service */
-
+    
+    // SH: Create array of addresses
+    struct sockaddr_in * adds[parsed_config.num_rows];
+    // Trying to have client socket to two diff addresses
+    // struct sockaddr_in c_echoServAddr2; /* Echo server address */
+    // unsigned short c_echoServPort2;     /* Echo server port */
+    char *c_servIP2;
+    if (argc == 5){
+        c_echoServPort = atoi(argv[3]);  /* Use given port, if any */
+        // c_echoServPort2 = atoi(argv[4]);
+        c_servIP2 = argv[4];            // For extra client socket
+    }
+    // memset(&c_echoServAddr2, 0, sizeof(c_echoServAddr2));    /* Zero out structure */
+    // c_echoServAddr2.sin_family = AF_INET;
+    // c_echoServAddr2.sin_addr.s_addr = inet_addr(c_servIP2);  /* Server IP address */
+    // c_echoServAddr2.sin_port = htons(c_echoServPort);       /* Server port */
     // Mine
-    c_echoServPort = 90211;  // Hard code what this program will send to
+    // c_echoServPort = 90210;  // Hard code what this program will send to
 
     /* Create a best-effort datagram socket using UDP */
     if ((c_sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
@@ -107,15 +136,12 @@ int main(int argc, char *argv[])
     c_echoServAddr.sin_addr.s_addr = inet_addr(c_servIP);  /* Server IP address */
     c_echoServAddr.sin_port = htons(c_echoServPort);       /* Server port */
 //^****************client**********************
-
     //v****************client**********************
         /* Send the string to the server */
         // if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
         //            &c_echoServAddr, sizeof(c_echoServAddr)) != c_echoStringLen)
         //     DieWithError("2sendto() sent a different number of bytes than expected");
         //^****************client**********************
-
-
     // /* Create socket for sending/receiving datagrams */
     if ((s_sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
         DieWithError("socket() failed");
@@ -129,67 +155,48 @@ int main(int argc, char *argv[])
      // Bind to the local address 
     if (bind(s_sock, (struct sockaddr *) &s_echoServAddr, sizeof(s_echoServAddr)) < 0)
         DieWithError("bind() failed");
-  
-    struct timeval tv;
-    tv.tv_sec = 3;
-    tv.tv_usec = 0;
-    /* Set timeout recvm */
-    printf("\nBefore setsockopt");
-    if (setsockopt(s_sock, SOL_SOCKET, SO_RCVTIMEO,&tv,sizeof(tv)) < 0) {
-        perror("Error");
-    }
-    else{
-        printf("\nSuccess setsockopt");
-    }
+    int counter = 0;
     for (;;) /* Run forever */
     {
-        printf("\nIn for loop");
         /* Set the size of the in-out parameter */
         s_cliAddrLen = sizeof(s_echoClntAddr);
-
+        alarm(TIMEOUT_SECS);
         /* Block until receive message from a client */
-        // if ((s_recvMsgSize = recvfrom(s_sock, s_echoBuffer, ECHOMAX, 0,
-        //     (struct sockaddr *) &s_echoClntAddr, &s_cliAddrLen)) < 0)
-        //     DieWithError("recvfrom() failed");
-        if (recvfrom(s_sock, s_echoBuffer, ECHOMAX, 0,
-            (struct sockaddr *) &s_echoClntAddr, &s_cliAddrLen) < 0)
-            DieWithError("2recvfrom() failed");
-
-
-        // printf("Handling client %s\n", inet_ntoa(s_echoClntAddr.sin_addr));
-        // Host commented out
-        /* Send received datagram back to the client */
-        // if (sendto(s_sock, s_echoBuffer, s_recvMsgSize, 0, 
-             // (struct sockaddr *) &s_echoClntAddr, sizeof(s_echoClntAddr)) != s_recvMsgSize)
-            // DieWithError("sendto() sent a different number of bytes than expected");
-
-        //v****************client**********************
-        /* Send the string to the server */
-        // if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
-        //            &c_echoServAddr, sizeof(c_echoServAddr)) != c_echoStringLen)
-        //     DieWithError("2sendto() sent a different number of bytes than expected");
-        //^****************client**********************
-        // Alternative, passing msg from server buffer to client buffer out
-        // if (sendto(c_sock, s_echoBuffer, s_recvMsgSize, 0, 
-        //      (struct sockaddr *) &c_echoServAddr, sizeof(c_echoServAddr)) != s_recvMsgSize)
-        //     DieWithError("3sendto() sent a different number of bytes than expected");
-        // else{
-        //     printf("Sending message from client?:%s",s_echoBuffer);
-        // }
-        // while (1){      // Keep sending periodically indefinitely every 2 seconds
-            // sleep(5);   // Wait 2 seconds before sending again
-            // if (tries < MAXTRIES)      /* incremented by signal handler */
-            // {
-                // printf("\nSending periodic message...");
-                // // printf("timed out, %d more tries...\n", MAXTRIES-tries);
-                // if (sendto(c_sock, s_echoBuffer, s_recvMsgSize, 0, (struct sockaddr *)
-                //             &c_echoServAddr, sizeof(c_echoServAddr)) != s_recvMsgSize)
-                //     DieWithError("sendto() failed");
-            // } 
-            // else
-                // DieWithError("No Response");
-        // }
-        printf("\nout of while");
+        printf("\nWaiting for other messages...");
+        printf("\n\nCounter:%d",counter);
+        if(counter % 5 != 0){
+            while ((s_recvMsgSize = recvfrom(s_sock, s_echoBuffer, ECHOMAX, 0,
+                (struct sockaddr *) &s_echoClntAddr, &s_cliAddrLen)) < 0)
+                if (errno == EINTR){
+                    printf("\nAttempting to send my message...");
+                    if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
+                        &c_echoServAddr, sizeof(c_echoServAddr)) != c_echoStringLen)
+                        DieWithError("sendto() sent a different number of bytes than expected");
+                    if (argc == 5){
+                        printf("\nSending message to different port...");
+                        // if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
+                        // &c_echoServAddr2, sizeof(c_echoServAddr2)) != c_echoStringLen)
+                        DieWithError("sendto() sent a different number of bytes than expected");
+                    }
+                    // printf("\nSetting alarm within errno if");
+                    alarm(TIMEOUT_SECS);
+                }
+            printf("\nGot message from %s", inet_ntoa(s_echoClntAddr.sin_addr));
+            printf("\nMessage:%s",s_echoBuffer);
+        }
+        else{
+            printf("\nForce sending message...");
+            if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
+                &c_echoServAddr, sizeof(c_echoServAddr)) != c_echoStringLen)
+                DieWithError("sendto() sent a different number of bytes than expected");
+            if (argc == 5){
+                printf("\nForce sending message to different port...");
+                // if (sendto(c_sock, c_echoString, c_echoStringLen, 0, (struct sockaddr *)
+                // &c_echoServAddr2, sizeof(c_echoServAddr2)) != c_echoStringLen)
+                DieWithError("sendto() sent a different number of bytes than expected");
+            }
+        }
+        counter++;
     }
     /* NOT REACHED */
 }
