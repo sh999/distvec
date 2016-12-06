@@ -93,6 +93,10 @@ int main(int argc, char *argv[])
     printf("\nMsg to send:%s",c_echoString);
     if ((c_echoStringLen = strlen(c_echoString)) > ECHOMAX)
         DieWithError("Echo word too long");
+    if (argc == 4)
+        c_echoServPort = atoi(argv[3]);   Use given port, if any 
+    else
+        c_echoServPort = 7;  /* 7 is well-known port for echo service */
     printf("Setting up...");
     // SH: Create array of addresses
     struct sockaddr_in all_addresses[parsed_config.num_rows];  //SH: addresses to create sockets from
