@@ -1,5 +1,5 @@
-// Merged server.c and client.c so this prog can listen and send
-// This sort of works
+// An attempt at making periodic send while listening
+// Doesn't work so far
 /*
 To test:
 Run a server program listening on 90211

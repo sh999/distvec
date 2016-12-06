@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
             } 
             else
                 DieWithError("No Response");
-        }
+    }
     /* null-terminate the received data */
     c_echoBuffer[c_respStringLen] = '\0';
     printf("Received: %s\n", c_echoBuffer);    /* Print the received data */
