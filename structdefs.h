@@ -2,41 +2,41 @@
 struct My_node{
     // char* name;  // My node name
     // char* port;
-    char name[256];  // My node name
-    char port[256];
+    char name[6];  // My node name
+    char port[6];
 };
 struct Neighbor{
-    char name[256];
-    char cost[256];
-    char address[256];
+    char name[6];
+    char cost[6];
+    char address[6];
 };
 struct DV_Element {
-    char dest[256];
+    char dest[6];
     int dist;
 };
 struct Distance_vector {
-    char sender[256];
+    char sender[6];
     int num_of_dests;
-    struct DV_Element element[10];
+    struct DV_Element element[8];
 };
 struct RT_element {
-    char node[256];
+    char node[6];
     int dist;
-    char next_hop[256];
+    char next_hop[6];
 };
 struct Routing_table {
-    char node[256];
+    char node[6];
     int num_rows;
-    struct RT_element element[10];
+    struct RT_element element[8];
 };
 struct Config_element {
-    char node[256];
-    char dist[256];
-    char address[256];
+    char node[6];
+    char dist[6];
+    char address[16];
 };
 struct Parsed_config {
-    char node[256];
-    char port[256];
+    char node[6];
+    char port[6];
     int num_rows;
-    struct Config_element element[10];
+    struct Config_element element[8];
 };

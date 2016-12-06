@@ -82,6 +82,10 @@ int main(int argc, char *argv[])
     printf("%d",msg.a);
     printf("%d",msg.b);
 
+    printf("\nSIZEOF dv:%zu",sizeof(msg));
+    size_t test = sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)
+               &echoServAddr, sizeof(echoServAddr));
+    printf("\nSIZEOF test:%zu",test);
     sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)
                &echoServAddr, sizeof(echoServAddr));
     /* Get a response */
@@ -112,6 +116,7 @@ int main(int argc, char *argv[])
     /* null-terminate the received data */
     echoBuffer[respStringLen] = '\0';
     printf("Received: %s\n", echoBuffer);    /* Print the received data */
+
     
     close(sock);
     exit(0);
