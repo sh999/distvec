@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
         alarm(TIMEOUT_SECS);
         /* Block until receive message from a client */
         printf("\nWaiting for other messages...");
-        printf("\n\nCounter:%d",counter);
+        printf("\n\nStep:%d",counter);
         if(counter % 5 != 0){
             while ((s_recvMsgSize = recvfrom(s_sock, s_echoBuffer, ECHOMAX, 0,
                 (struct sockaddr *) &s_echoClntAddr, &s_cliAddrLen)) < 0)
