@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
     //     printf("\noooi:%d  %c...",i,dv.sender[i]);
     // }
     for(int i = 0; i < dv.num_of_dests; i++){
-        // strcat(msg," ");
+        strcat(msg," ");
         strcat(msg,dv.element[i].dest);
         strcat(msg," ");
         char str_dist[6];
