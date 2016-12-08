@@ -68,12 +68,13 @@ void disp_routing_table (struct Routing_table rt) {
 void update_routing(struct Distance_vector dv, struct Routing_table rt){
     printf("\nUpdating routing");
     for(int i = 0; i < rt.num_rows;i++){
-        // printf("\n%c\t%d\t%c",rt.element[i].node, rt.element[i].dist, rt.element[i].next_hop);
+        // printf("\n%s\t%d\t%s",rt.element[i].node, rt.element[i].dist, rt.element[i].next_hop);
         for(int j = 0; j < dv.num_of_dests; j++){
-            printf("\nChecking if %c matches %c ",rt.element[i].node,dv.element[j].dest);
-            if(rt.element[i].node==dv.element[j].dest){ // Broken due to data change
+            printf("\nChecking if %s matches %s ",rt.element[i].node,dv.element[j].dest);
+            // if(rt.element[i].node==dv.element[j].dest){ // Broken due to data change
+            if(strcmp(rt.element[i].node,dv.element[j].dest)==0){
                 printf("\tMatch");
-                printf("\nrt dist:%d\tdv dist:%d",rt.element[i].dist , dv.element[j].dist);
+                printf("\n\trt dist:%d\tdv dist:%d",rt.element[i].dist , dv.element[j].dist);
                 if(dv.element[j].dist<rt.element[i].dist){
                     printf("\nDecreasing distance");
                     rt.element[i].dist = dv.element[j].dist;
@@ -309,13 +310,16 @@ struct Distance_vector test_create_dv(){
     /*
         Test creation of distance vector
     */
+        printf("\nin test create dv");
     struct Distance_vector dv_incoming;
     strcpy(dv_incoming.sender,"A");
-    dv_incoming.sender[255] = '\0';
+    dv_incoming.sender[5] = '\0';
     dv_incoming.num_of_dests = 2;
     strcpy(dv_incoming.element[0].dest,"E");
+    dv_incoming.element[0].dest[5] = '\0';
     dv_incoming.element[0].dist = 3;
-    strcpy(dv_incoming.element[0].dest,"F");
+    strcpy(dv_incoming.element[1].dest,"F");
+    dv_incoming.element[1].dest[5] = '\0';
     dv_incoming.element[1].dist = 2;
     disp_distance_vector(dv_incoming);
     return dv_incoming;
@@ -325,21 +329,21 @@ struct Routing_table test_create_rt(){
         Test creation of routing table
 
     */
-    // struct Distance_vector dv_incoming;
-    // struct Routing_table rt;
-    // rt.node = 'A';
-    // rt.num_rows = 3;
-    // rt.element[0].node = 'E';
-    // rt.element[0].dist = 9;
-    // rt.element[0].next_hop = 'B';
-    // rt.element[1].node = 'F';
-    // rt.element[1].dist = 9;
-    // rt.element[1].next_hop = 'B';
-    // rt.element[2].node = 'C';
-    // rt.element[2].dist = 2;
-    // rt.element[2].next_hop = 'B';
-    // disp_routing_table(rt);
-    // return rt;
+    struct Distance_vector dv_incoming;
+    struct Routing_table rt;
+    strcpy(rt.node,"B");
+    rt.num_rows = 3;
+    strcpy(rt.element[0].node,"A");
+    rt.element[0].dist = 9;
+    strcpy(rt.element[0].next_hop,"B");
+    strcpy(rt.element[1].node,"F");
+    rt.element[1].dist = 9;
+    strcpy(rt.element[1].next_hop,"B");
+    strcpy(rt.element[2].node,"C");
+    rt.element[2].dist = 2;
+    strcpy(rt.element[2].next_hop,"B");
+    disp_routing_table(rt);
+    return rt;
 }
 
 
@@ -356,8 +360,8 @@ void test_update_routing(){
     struct Routing_table rt;
     dv = test_create_dv();
     rt = test_create_rt();
-    // disp_distance_vector(dv);
-    // disp_routing_table(rt);
+    disp_distance_vector(dv);
+    disp_routing_table(rt);
     update_routing(dv,rt);
 
 }
@@ -602,10 +606,10 @@ struct Distance_vector convert_str_to_dv(char msg[]){
     printf("\n--------------------");
     printf("\nDistance vector of %s",dv.sender);
     printf("\nNode\tDist");
-    for(int i = 0; i < dv.num_of_dests;i++){
-        printf("\n%s\t%d",dv.element[i].dest, dv.element[i].dist);
-    }
-    printf("\n--------------------");
+    // for(int i = 0; i < dv.num_of_dests;i++){
+    //     printf("\n%s\t%d",dv.element[i].dest, dv.element[i].dist);
+    // }
+    // printf("\n--------------------");
 
     return dv;
 
@@ -619,19 +623,23 @@ int main(void){
     // test_create_rt();
     // test_update_routing();
     // test_parse_config_to_struct();
-    // struct Parsed_config parsed_config;
-    // parsed_config = test_parse_config_to_struct();
+    struct Parsed_config parsed_config;
+    parsed_config = test_parse_config_to_struct();
     // test_create_rt_from_parsed();
     //setup_test_create_dv_from_rt()
     // test_dv_to_msg_setup();
     // test_string();
     // test_convert();
     { // test convert str to dv
-        char msg[] = "A  \n B  3 \nC     2";
-        struct Distance_vector dv;
-        dv = convert_str_to_dv(msg);
+        // char msg[] = "A  \n B  3 \nC     2";
+        // struct Distance_vector dv;
+        // dv = convert_str_to_dv(msg);
         // disp_distance_vector(dv);
     }
+    { // test update rt from dv
+
+    }
+    
 
     printf("\nReturned with no errors");
 
