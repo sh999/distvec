@@ -506,6 +506,40 @@ void test_dv_to_msg_setup(){
     printf("\nsizeof msg:%zu",sizeof(msg));
 }
 
+void test_string(){
+    // Testing strcat, strcpy
+    char str1[] = "bob";
+    char * str2 = "bo2";
+    char * str3;
+    char str4[30];
+    // strcpy(str3,str1);
+    strcpy(str4,str1);
+    strcat(str4,str1);
+    // str4[2] = '\0';
+    // printf("%s",str1);
+    printf("\n%zu",sizeof(str1));
+    printf("\n%s",str2);
+    printf("\n%zu",sizeof(str2));
+    printf("\n%s",str3);
+    printf("\n%zu",sizeof(str3));
+    printf("\n%send",str4);
+    printf("\n%zu",sizeof(str4));
+    for(int i = 0; i < 30;i++){
+        printf("\n%d%c",i,str4[i]);
+
+    }
+}
+
+void test_convert(){
+    char some[30];
+    int i = 33;
+    sprintf(some,"%d",i);
+    printf("\n%s",some);
+    char some2[30] = "123";
+    sscanf(some2,"%d",&i);
+    printf("\n%d",i);
+    printf("\n%d",i+1);
+}
 int main(void){
     // test_config();
     // test_token();
@@ -519,7 +553,9 @@ int main(void){
     // parsed_config = test_parse_config_to_struct();
     // test_create_rt_from_parsed();
     //setup_test_create_dv_from_rt()
-    test_dv_to_msg_setup();
+    // test_dv_to_msg_setup();
+    // test_string();
+    test_convert();
     printf("\nReturned with no errors");
 
 }

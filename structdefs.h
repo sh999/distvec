@@ -1,4 +1,3 @@
-
 struct My_node{
     // char* name;  // My node name
     // char* port;
