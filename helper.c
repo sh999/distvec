@@ -20,7 +20,7 @@ struct Parsed_config parse_config(){
     // struct Neighbor n1;
     struct Parsed_config parsed_config;
 
-    fp = fopen("./neighbor_config", "r");
+    fp = fopen("./config", "r");
     if (fp == NULL)
         exit(EXIT_FAILURE);
     int line_num = 1;
