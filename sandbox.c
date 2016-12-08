@@ -66,31 +66,32 @@ void disp_routing_table (struct Routing_table rt) {
     printf("\n--------------------");
 }
 void update_routing(struct Distance_vector dv, struct Routing_table rt){
-//     printf("\nUpdating routing");
-//     for(int i = 0; i < rt.num_rows;i++){
-//         // printf("\n%c\t%d\t%c",rt.element[i].node, rt.element[i].dist, rt.element[i].next_hop);
-//         for(int j = 0; j < dv.num_of_dests; j++){
-//             printf("\nChecking if %c matches %c ",rt.element[i].node,dv.element[j].dest);
-//             if(rt.element[i].node==dv.element[j].dest){ // Broken due to data change
-//                 printf("\tMatch");
-//                 printf("\nrt dist:%d\tdv dist:%d",rt.element[i].dist , dv.element[j].dist);
-//                 if(dv.element[j].dist<rt.element[i].dist){
-//                     printf("\nDecreasing distance");
-//                     rt.element[i].dist = dv.element[j].dist;
-//                 }
-//                 else{
-//                     printf("\nNot decreasing distance");
-//                 }
-//                 break;
-//             }
-//             else{
-//                 printf("\tNo match");
-//             }
-//         }
-//     }
-//     printf("\nAfter updating:");
-//     disp_routing_table(rt);
+    printf("\nUpdating routing");
+    for(int i = 0; i < rt.num_rows;i++){
+        // printf("\n%c\t%d\t%c",rt.element[i].node, rt.element[i].dist, rt.element[i].next_hop);
+        for(int j = 0; j < dv.num_of_dests; j++){
+            printf("\nChecking if %c matches %c ",rt.element[i].node,dv.element[j].dest);
+            if(rt.element[i].node==dv.element[j].dest){ // Broken due to data change
+                printf("\tMatch");
+                printf("\nrt dist:%d\tdv dist:%d",rt.element[i].dist , dv.element[j].dist);
+                if(dv.element[j].dist<rt.element[i].dist){
+                    printf("\nDecreasing distance");
+                    rt.element[i].dist = dv.element[j].dist;
+                }
+                else{
+                    printf("\nNot decreasing distance");
+                }
+                break;
+            }
+            else{
+                printf("\tNo match");
+            }
+        }
+    }
+    printf("\nAfter updating:");
+    disp_routing_table(rt);
 }
+
 
 int test_config()
 {
@@ -206,7 +207,6 @@ int test_tokenize_file()
         printf("Retrieved line of length %zu :\n", read);
         printf("%s", line);
 
-        // char str[] ="Elizarraras, Salvador, UG";
         char str[256];
         strncpy(str,line,sizeof str-1);
         str[255] = '\0';
@@ -540,6 +540,76 @@ void test_convert(){
     printf("\n%d",i);
     printf("\n%d",i+1);
 }
+struct Distance_vector convert_str_to_dv(char msg[]){
+    // Convert string to struct dv
+    printf("\nmsg:%s",msg);
+    
+
+    // printf ("Get tokens from string \"%s\"\n",str);
+    // printf("%s\n", "*********************************************");
+
+   // Split the string into tokens delimited by spaces and commas
+   // token = strtok (str," ,");
+    printf("\nTokens:\n");
+    int n_tokens = 0;
+    int line_num = 1;
+    char *token = NULL;
+    token = strtok (msg," \r\n");   
+    int neighbors = 0;
+    struct Distance_vector dv;
+    int curr_neighbor = -1;
+    while (token != NULL)
+    {
+        printf("\nn_tokens:%d,token:%s.", n_tokens,token);
+        printf("\nsize:%zu",sizeof(*token));
+        if(n_tokens == 0){
+            strcpy(dv.sender,token);
+            dv.sender[5] = '\0';
+            printf("\nAdding sender:%s",token);
+            printf("\ndv sender:%s.",dv.sender);
+
+        }
+        else if(n_tokens % 2 == 1 || n_tokens == 1){
+            curr_neighbor++;
+            printf("\n%d",curr_neighbor);
+            strcpy(dv.element[curr_neighbor].dest,token);
+            dv.sender[5] = '\0';
+            printf("\nAdding neighbor:%s",token);
+            printf("\ndv neighbor:%s.",dv.element[curr_neighbor].dest);
+        }
+        else if(n_tokens % 2 == 0){
+            int int_dist;
+            sscanf(token,"%d",&int_dist);
+            dv.element[curr_neighbor].dist = int_dist;
+            printf("\nAdding dist:%d",int_dist);
+            printf("\ndv dist:%d.",dv.element[curr_neighbor].dist);
+        }
+
+        printf("\ncurr_n:%d",curr_neighbor);
+
+        // Different call
+        token = strtok (NULL, " \r\n");
+        n_tokens++;
+        if (n_tokens % 2 == 0){
+            neighbors++;
+        }
+        printf("\n");
+    }
+    dv.num_of_dests = neighbors;
+
+    printf("\nnum_of_dests:%d",dv.num_of_dests);
+    printf("\nsender:%s",dv.sender);
+    printf("\n--------------------");
+    printf("\nDistance vector of %s",dv.sender);
+    printf("\nNode\tDist");
+    for(int i = 0; i < dv.num_of_dests;i++){
+        printf("\n%s\t%d",dv.element[i].dest, dv.element[i].dist);
+    }
+    printf("\n--------------------");
+
+    return dv;
+
+}
 int main(void){
     // test_config();
     // test_token();
@@ -555,7 +625,14 @@ int main(void){
     //setup_test_create_dv_from_rt()
     // test_dv_to_msg_setup();
     // test_string();
-    test_convert();
+    // test_convert();
+    { // test convert str to dv
+        char msg[] = "A  \n B  3 \nC     2";
+        struct Distance_vector dv;
+        dv = convert_str_to_dv(msg);
+        // disp_distance_vector(dv);
+    }
+
     printf("\nReturned with no errors");
 
 }
