@@ -30,7 +30,7 @@ struct Routing_table {
 };
 struct Config_element {
     char node[6];
-    char dist[6];
+    int dist;
     char address[16];
 };
 struct Parsed_config {

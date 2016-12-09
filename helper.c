@@ -53,8 +53,11 @@ struct Parsed_config parse_config(){
                     // n1.name[255] = '\0';
                 }
                 if(n_tokens==1){
-                    strncpy(parsed_config.element[line_num-3].dist,token,sizeof parsed_config.element[line_num-3].dist-1);
-                    parsed_config.element[line_num-3].dist[255] = '\0';
+                    // strncpy(parsed_config.element[line_num-3].dist,token,sizeof parsed_config.element[line_num-3].dist-1);
+                    // parsed_config.element[line_num-3].dist[255] = '\0';
+                    int int_dist;
+                    sscanf(token,"%d",&int_dist);
+                    parsed_config.element[line_num-3].dist = int_dist;
                 }
                 if(n_tokens==2){
                     strncpy(parsed_config.element[line_num-3].address,token,sizeof parsed_config.element[line_num-3].address-1);
@@ -113,9 +116,9 @@ struct Routing_table create_rt_from_parsed(struct Parsed_config parsed_config){
     rt.num_rows = parsed_config.num_rows;
     for(int i = 0; i < rt.num_rows;i++){
         strcpy(rt.element[i].node,parsed_config.element[i].node);
-        int num;
-        sscanf(parsed_config.element[i].dist,"%d",&num);
-        rt.element[i].dist = num;
+        // int num;
+        // sscanf(parsed_config.element[i].dist,"%d",&num);
+        rt.element[i].dist = parsed_config.element[i].dist;
         strcpy(rt.element[i].next_hop, parsed_config.element[i].node); 
     }
     // rt.num_rows++;
@@ -201,13 +204,13 @@ struct Distance_vector convert_str_to_dv(char msg[]){
     return dv;
 
 }
-struct Routing_table update_routing(struct Distance_vector dv, struct Routing_table rt){
+struct Routing_table update_routing(struct Distance_vector dv, struct Routing_table rt, struct Parsed_config pc){
     // printf("\nUpdating routing");
     int add_to;
-    for(int i = 0; i < rt.num_rows; i++){
-        printf("\nrt element node:%s",rt.element[i].node);
-        if(strcmp(dv.sender,rt.element[i].node)==0){
-            add_to = rt.element[i].dist;
+    for(int i = 0; i < pc.num_rows; i++){
+        printf("\npc element node:%s",pc.element[i].node);
+        if(strcmp(dv.sender,pc.element[i].node)==0){
+            add_to = pc.element[i].dist;
         }
     }
     for(int j = 0; j < dv.num_of_dests; j++){

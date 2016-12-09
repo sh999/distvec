@@ -46,7 +46,7 @@ void disp_distance_vector (struct Distance_vector dv);
 struct Distance_vector create_dv_from_rt(struct Routing_table rt);
 struct Routing_table create_rt_from_parsed(struct Parsed_config parsed_config);
 struct Distance_vector convert_str_to_dv(char msg[]);
-struct Routing_table update_routing(struct Distance_vector dv, struct Routing_table rt);
+struct Routing_table update_routing(struct Distance_vector dv, struct Routing_table rt, struct Parsed_config parsed_config);
 
 int main(int argc, char *argv[])
 {
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     printf("\nMy node name:%s",parsed_config.node);
     printf("\nMy port:%s",parsed_config.port);
     for(int i = 0; i < parsed_config.num_rows; i++){
-        printf("Neighbor #%d :\t%s\tDist:%s\tAddress:%s\n",i,parsed_config.element[i].node,parsed_config.element[i].dist,parsed_config.element[i].address);
+        printf("Neighbor #%d :\t%s\tDist:%d\tAddress:%s\n",i,parsed_config.element[i].node,parsed_config.element[i].dist,parsed_config.element[i].address);
     }
     printf("\n---------------------------------");
 
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
             struct Distance_vector rec_dv;
             rec_dv = convert_str_to_dv(s_echoBuffer);
             disp_distance_vector(rec_dv);
-            rt = update_routing(rec_dv,rt);
+            rt = update_routing(rec_dv,rt,parsed_config);
             disp_routing_table(rt);
         }
         else{
