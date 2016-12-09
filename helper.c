@@ -203,6 +203,13 @@ struct Distance_vector convert_str_to_dv(char msg[]){
 }
 struct Routing_table update_routing(struct Distance_vector dv, struct Routing_table rt){
     // printf("\nUpdating routing");
+    int add_to;
+    for(int i = 0; i < rt.num_rows; i++){
+        printf("\nrt element node:%s",rt.element[i].node);
+        if(strcmp(dv.sender,rt.element[i].node)==0){
+            add_to = rt.element[i].dist;
+        }
+    }
     for(int j = 0; j < dv.num_of_dests; j++){
         // printf("\n%s\t%d\t%s",rt.element[i].node, rt.element[i].dist, rt.element[i].next_hop);
         int match = 0;
@@ -213,7 +220,7 @@ struct Routing_table update_routing(struct Distance_vector dv, struct Routing_ta
                 // printf("\tMatch");
                 match = 1;
                 // printf("\n\trt dist:%d\tdv dist:%d",rt.element[i].dist , dv.element[j].dist);
-                if(dv.element[j].dist<rt.element[i].dist){
+                if(dv.element[j].dist + add_to < rt.element[i].dist){
                     // printf("\nDecreasing distance");
                     rt.element[i].dist = dv.element[j].dist;
                     strcpy(rt.element[i].next_hop,dv.sender);
