@@ -135,3 +135,64 @@ struct Distance_vector create_dv_from_rt(struct Routing_table rt){
     }
     return dv;
 }
+
+struct Distance_vector convert_str_to_dv(char msg[]){
+    // Convert string to struct dv
+    // printf("\nmsg:%s",msg);
+   // Split the string into tokens delimited by spaces and commas
+    // printf("\nTokens:\n");
+    int n_tokens = 0;
+    int line_num = 1;
+    char *token = NULL;
+    token = strtok (msg," \r\n");   
+    int neighbors = 0;
+    struct Distance_vector dv;
+    int curr_neighbor = -1;
+    while (token != NULL)
+    {
+        // printf("\nn_tokens:%d,token:%s.", n_tokens,token);
+        // printf("\nsize:%zu",sizeof(*token));
+        if(n_tokens == 0){
+            strcpy(dv.sender,token);
+            dv.sender[5] = '\0';
+            // printf("\nAdding sender:%s",token);
+            // printf("\ndv sender:%s.",dv.sender);
+
+        }
+        else if(n_tokens % 2 == 1 || n_tokens == 1){
+            curr_neighbor++;
+            // printf("\n%d",curr_neighbor);
+            strcpy(dv.element[curr_neighbor].dest,token);
+            dv.sender[5] = '\0';
+            // printf("\nAdding neighbor:%s",token);
+            // printf("\ndv neighbor:%s.",dv.element[curr_neighbor].dest);
+        }
+        else if(n_tokens % 2 == 0){
+            int int_dist;
+            sscanf(token,"%d",&int_dist);
+            dv.element[curr_neighbor].dist = int_dist;
+            // printf("\nAdding dist:%d",int_dist);
+            // printf("\ndv dist:%d.",dv.element[curr_neighbor].dist);
+        }
+
+        // printf("\ncurr_n:%d",curr_neighbor);
+
+        // Different call
+        token = strtok (NULL, " \r\n");
+        n_tokens++;
+        if (n_tokens % 2 == 0){
+            neighbors++;
+        }
+        // printf("\n");
+    }
+    dv.num_of_dests = neighbors;
+
+    // printf("\nnum_of_dests:%d",dv.num_of_dests);
+    // printf("\nsender:%s",dv.sender);
+    // printf("\n--------------------");
+    // printf("\nDistance vector of %s",dv.sender);
+    // printf("\nNode\tDist");
+
+    return dv;
+
+}

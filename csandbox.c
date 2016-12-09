@@ -8,7 +8,9 @@
 // Based on multistruct.c
 // Nodes can use this program by reading config file and using addresses from it
 // based on multi-addr.c
-// Experiment on sending an array of strings instead of struct or simple string
+// Can send dv as string
+// based on multi-msg.c
+// Trying to send dv as string, then when receive, turn back to dv and display it
 /*
 To test:
 Run a server program listening on 90211
@@ -43,6 +45,7 @@ void disp_routing_table (struct Routing_table rt);
 void disp_distance_vector (struct Distance_vector dv);
 struct Distance_vector create_dv_from_rt(struct Routing_table rt);
 struct Routing_table create_rt_from_parsed(struct Parsed_config parsed_config);
+struct Distance_vector convert_str_to_dv(char msg[]);
 int main(int argc, char *argv[])
 {
     struct Parsed_config parsed_config;
@@ -219,6 +222,9 @@ int main(int argc, char *argv[])
                 }
             printf("\nGot message from %s", inet_ntoa(s_echoClntAddr.sin_addr));
             printf("\nMessage:\n%s",s_echoBuffer);
+            struct Distance_vector rec_dv;
+            rec_dv = convert_str_to_dv(s_echoBuffer);
+            disp_distance_vector(rec_dv);
         }
         else{
             printf("\nForce sending message...");
