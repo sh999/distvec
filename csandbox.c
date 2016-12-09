@@ -46,6 +46,8 @@ void disp_distance_vector (struct Distance_vector dv);
 struct Distance_vector create_dv_from_rt(struct Routing_table rt);
 struct Routing_table create_rt_from_parsed(struct Parsed_config parsed_config);
 struct Distance_vector convert_str_to_dv(char msg[]);
+struct Routing_table update_routing(struct Distance_vector dv, struct Routing_table rt);
+
 int main(int argc, char *argv[])
 {
     struct Parsed_config parsed_config;
@@ -225,6 +227,8 @@ int main(int argc, char *argv[])
             struct Distance_vector rec_dv;
             rec_dv = convert_str_to_dv(s_echoBuffer);
             disp_distance_vector(rec_dv);
+            rt = update_routing(rec_dv,rt);
+            disp_routing_table(rt);
         }
         else{
             printf("\nForce sending message...");

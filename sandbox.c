@@ -65,7 +65,7 @@ void disp_routing_table (struct Routing_table rt) {
     }
     printf("\n--------------------");
 }
-void update_routing(struct Distance_vector dv, struct Routing_table rt){
+struct Routing_table update_routing(struct Distance_vector dv, struct Routing_table rt){
     // printf("\nUpdating routing");
     for(int j = 0; j < dv.num_of_dests; j++){
         // printf("\n%s\t%d\t%s",rt.element[i].node, rt.element[i].dist, rt.element[i].next_hop);
@@ -95,8 +95,9 @@ void update_routing(struct Distance_vector dv, struct Routing_table rt){
             strcpy(rt.element[rt.num_rows-1].next_hop, dv.sender);
         }
     }
-    printf("\nAfter updating:");
-    disp_routing_table(rt);
+    // printf("\nAfter updating:");
+    // disp_routing_table(rt);
+    return rt;
 }
 
 
@@ -650,7 +651,8 @@ int main(void){
         disp_distance_vector(dv);
         struct Routing_table rt;
         rt = test_create_rt();
-        update_routing(dv,rt);
+        rt = update_routing(dv,rt);
+        disp_routing_table(rt);
     }
     
 

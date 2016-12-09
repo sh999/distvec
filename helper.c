@@ -196,3 +196,37 @@ struct Distance_vector convert_str_to_dv(char msg[]){
     return dv;
 
 }
+struct Routing_table update_routing(struct Distance_vector dv, struct Routing_table rt){
+    // printf("\nUpdating routing");
+    for(int j = 0; j < dv.num_of_dests; j++){
+        // printf("\n%s\t%d\t%s",rt.element[i].node, rt.element[i].dist, rt.element[i].next_hop);
+        int match = 0;
+        for(int i = 0; i < rt.num_rows;i++){
+            // printf("\nChecking if rt %s matches dv%s ",rt.element[i].node,dv.element[j].dest);
+            // if(rt.element[i].node==dv.element[j].dest){ // Broken due to data change
+            if(strcmp(rt.element[i].node,dv.element[j].dest)==0){
+                // printf("\tMatch");
+                match = 1;
+                // printf("\n\trt dist:%d\tdv dist:%d",rt.element[i].dist , dv.element[j].dist);
+                if(dv.element[j].dist<rt.element[i].dist){
+                    // printf("\nDecreasing distance");
+                    rt.element[i].dist = dv.element[j].dist;
+                    strcpy(rt.element[i].next_hop,dv.sender);
+                }
+                else{
+                    // printf("\nNot decreasing distance");
+                }
+                break;
+            }
+        }
+        if(match == 0){
+            rt.num_rows++;
+            strcpy(rt.element[rt.num_rows-1].node,dv.element[j].dest);
+            rt.element[rt.num_rows-1].dist = dv.element[j].dist;
+            strcpy(rt.element[rt.num_rows-1].next_hop, dv.sender);
+        }
+    }
+    // printf("\nAfter updating:");
+    // disp_routing_table(rt);
+    return rt;
+}
