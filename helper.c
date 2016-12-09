@@ -234,7 +234,7 @@ struct Routing_table update_routing(struct Distance_vector dv, struct Routing_ta
         if(match == 0){
             rt.num_rows++;
             strcpy(rt.element[rt.num_rows-1].node,dv.element[j].dest);
-            rt.element[rt.num_rows-1].dist = dv.element[j].dist;
+            rt.element[rt.num_rows-1].dist = dv.element[j].dist + add_to;
             strcpy(rt.element[rt.num_rows-1].next_hop, dv.sender);
         }
     }
