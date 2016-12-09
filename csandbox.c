@@ -239,8 +239,11 @@ int main(int argc, char *argv[])
                 rec_dv = convert_str_to_dv(s_echoBuffer);
                 disp_distance_vector(rec_dv);
                 rt = update_routing(rec_dv,rt,parsed_config);
+                printf("\nUpdated rt:");
                 disp_routing_table(rt);
                 dv = create_dv_from_rt(rt);
+                printf("\nUpdated dv:");
+                disp_distance_vector(dv);
                 for(int i = 0; i < dv.num_of_dests; i++){
                     msg[0] = '\0';
                     strcpy(msg,dv.sender);
