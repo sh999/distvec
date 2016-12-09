@@ -222,7 +222,7 @@ struct Routing_table update_routing(struct Distance_vector dv, struct Routing_ta
                 // printf("\n\trt dist:%d\tdv dist:%d",rt.element[i].dist , dv.element[j].dist);
                 if(dv.element[j].dist + add_to < rt.element[i].dist){
                     // printf("\nDecreasing distance");
-                    rt.element[i].dist = dv.element[j].dist;
+                    rt.element[i].dist = dv.element[j].dist + add_to;
                     strcpy(rt.element[i].next_hop,dv.sender);
                 }
                 else{
