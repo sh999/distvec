@@ -5,7 +5,7 @@
 #include <string.h>
 
 #include "structdefs.h"
-struct Parsed_config parse_config(){
+struct Parsed_config parse_config(char file[]){
     /*
         Read config file to create initial routing table
     */
@@ -14,7 +14,7 @@ struct Parsed_config parse_config(){
     size_t len = 0;
     ssize_t read;
     struct Parsed_config parsed_config;
-    fp = fopen("./config", "r");
+    fp = fopen(file, "r");
     if (fp == NULL)
         exit(EXIT_FAILURE);
     int line_num = 1;

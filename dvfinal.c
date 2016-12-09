@@ -23,7 +23,7 @@ void CatchAlarm(int ignored);            /* Handler for SIGALRM */
 
 //*****************client**********************
 void DieWithError(char *errorMessage);  /* External error handling function */
-struct Parsed_config parse_config();
+struct Parsed_config parse_config(char file[]);
 void disp_routing_table (struct Routing_table rt);
 void disp_distance_vector (struct Distance_vector dv);
 struct Distance_vector create_dv_from_rt(struct Routing_table rt);
@@ -34,7 +34,7 @@ struct Routing_table update_routing(struct Distance_vector dv, struct Routing_ta
 int main(int argc, char *argv[])
 {
     struct Parsed_config parsed_config;
-    parsed_config = parse_config();
+    parsed_config = parse_config(argv[1]);
     parsed_config.node[1] = '\0';
     printf("\nInitial properties");
     printf("\n--------------------------------");
@@ -154,7 +154,6 @@ int main(int argc, char *argv[])
                         if (sendto(c_sock, msg, sizeof(msg), 0, (struct sockaddr *)
                             &all_addresses[i], sizeof(all_addresses[i])) != sizeof(msg))
                             DieWithError("sendto() sent a different number of bytes than expected");
-                        printf("success");
                     }
                     alarm(TIMEOUT_SECS);        // Set timeout again
                 }
@@ -186,7 +185,6 @@ int main(int argc, char *argv[])
                     &all_addresses[i], sizeof(all_addresses[i])) != sizeof(msg))
                     DieWithError("sendto() sent a different number of bytes than expected");
                 }
-                printf("success");
         }
         counter++;
     }
