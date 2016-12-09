@@ -664,6 +664,21 @@ int main(void){
         rt = test_create_rt();
         rt = update_routing(dv,rt);
         disp_routing_table(rt);
+         char msg2[255];
+                    msg2[0] = '\0';
+                    strcpy(msg2,dv.sender);
+         for(int i = 0; i < dv.num_of_dests; i++){
+                    strcat(msg2,"\n");
+                     printf("\nin:%s",msg2);
+                    strcat(msg2,dv.element[i].dest);
+                    strcat(msg2," ");
+                    printf("\nin:%s",msg2);
+                    char str_dist[6];
+                    sprintf(str_dist,"%d",dv.element[i].dist);
+                    strcat(msg2,str_dist);
+                }
+        printf("\nfinal%s",msg2);
+
     }
     
 

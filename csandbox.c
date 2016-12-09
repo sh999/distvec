@@ -244,9 +244,9 @@ int main(int argc, char *argv[])
                 dv = create_dv_from_rt(rt);
                 printf("\nUpdated dv:");
                 disp_distance_vector(dv);
+                msg[0] = '\0';
+                strcpy(msg,dv.sender);
                 for(int i = 0; i < dv.num_of_dests; i++){
-                    msg[0] = '\0';
-                    strcpy(msg,dv.sender);
                     strcat(msg,"\n");
                     strcat(msg,dv.element[i].dest);
                     strcat(msg," ");
