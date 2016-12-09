@@ -233,13 +233,24 @@ int main(int argc, char *argv[])
                     // printf("\nSetting alarm within errno if");
                     alarm(TIMEOUT_SECS);
                 }
-            printf("\nGot message from %s", inet_ntoa(s_echoClntAddr.sin_addr));
-            printf("\nMessage:\n%s",s_echoBuffer);
-            struct Distance_vector rec_dv;
-            rec_dv = convert_str_to_dv(s_echoBuffer);
-            disp_distance_vector(rec_dv);
-            rt = update_routing(rec_dv,rt,parsed_config);
-            disp_routing_table(rt);
+                printf("\nGot message from %s", inet_ntoa(s_echoClntAddr.sin_addr));
+                printf("\nMessage:\n%s",s_echoBuffer);
+                struct Distance_vector rec_dv;
+                rec_dv = convert_str_to_dv(s_echoBuffer);
+                disp_distance_vector(rec_dv);
+                rt = update_routing(rec_dv,rt,parsed_config);
+                disp_routing_table(rt);
+                dv = create_dv_from_rt(rt);
+                for(int i = 0; i < dv.num_of_dests; i++){
+                    msg[0] = '\0';
+                    strcpy(msg,dv.sender);
+                    strcat(msg,"\n");
+                    strcat(msg,dv.element[i].dest);
+                    strcat(msg," ");
+                    char str_dist[6];
+                    sprintf(str_dist,"%d",dv.element[i].dist);
+                    strcat(msg,str_dist);
+                }
         }
         else{
             printf("\nForce sending message...");
