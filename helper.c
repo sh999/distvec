@@ -118,6 +118,11 @@ struct Routing_table create_rt_from_parsed(struct Parsed_config parsed_config){
         rt.element[i].dist = num;
         strcpy(rt.element[i].next_hop, parsed_config.element[i].node); 
     }
+    // rt.num_rows++;
+    // printf("%d",rt.num_rows:)
+    // strcpy(rt.element[rt.num_rows-1].node,rt.node);
+    // rt.element[rt.num_rows-1].dist = 0;
+    // strcpy(rt.element[rt.num_rows-1].next_hop,rt.node); 
     // disp_routing_table(rt);
     return rt;
 }

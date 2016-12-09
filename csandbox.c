@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
 {
     struct Parsed_config parsed_config;
     parsed_config = parse_config();
+    parsed_config.node[1] = '\0';
     printf("\n--------Config Properties--------");
     printf("\nMy node name:%s",parsed_config.node);
     printf("\nMy port:%s",parsed_config.port);
@@ -62,11 +63,21 @@ int main(int argc, char *argv[])
 
     struct Routing_table rt;
     rt = create_rt_from_parsed(parsed_config);
+    
     disp_routing_table(rt);
 
     struct Distance_vector dv;
     dv = create_dv_from_rt(rt);
     disp_distance_vector(dv);
+
+    rt.num_rows++;
+    printf("%d",rt.num_rows);
+    strcpy(rt.element[rt.num_rows-1].node,parsed_config.node);
+    rt.element[rt.num_rows-1].dist = 0;
+    strcpy(rt.element[rt.num_rows-1].next_hop,parsed_config.node); 
+    // rt.element[rt.num_rows-1].node[1] = '\0';
+    // rt.element[rt.num_rows-1].node[1] = '\0';
+    disp_routing_table(rt);
 
     int s_sock;                        /* Socket */
     struct sockaddr_in s_echoServAddr; /* Local address */
