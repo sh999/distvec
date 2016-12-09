@@ -1,14 +1,12 @@
-struct My_node{
-    // char* name;  // My node name
-    // char* port;
-    char name[6];  // My node name
-    char port[6];
-};
-struct Neighbor{
-    char name[6];
-    char cost[6];
-    char address[6];
-};
+// struct My_node{
+//     char name[6];  
+//     char port[6];
+// };
+// struct Neighbor{
+//     char name[6];
+//     char cost[6];
+//     char address[6];
+// };
 struct DV_Element {
     char dest[6];
     int dist;

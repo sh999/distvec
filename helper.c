@@ -1,5 +1,4 @@
-// Helper functions for client server
-// Functions have been tested in sandbox 
+// Helper functions for distance vector routing protocol program
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,35 +9,24 @@ struct Parsed_config parse_config(){
     /*
         Read config file to create initial routing table
     */
-    // printf("\nTesting making init routing table from config file");
     FILE * fp;
     char * line = NULL;
     size_t len = 0;
     ssize_t read;
-
-    // struct My_node my_node;
-    // struct Neighbor n1;
     struct Parsed_config parsed_config;
-
     fp = fopen("./config", "r");
     if (fp == NULL)
         exit(EXIT_FAILURE);
     int line_num = 1;
     while ((read = getline(&line, &len, fp)) != -1) {
-        // printf("Retrieved line of length %zu :\n", read);
-        // printf("%s", line);
-
         char str[256];
         strncpy(str,line,sizeof str-1);
         str[255] = '\0';
         char *token = NULL;
         int n_tokens = 0;
-
-       // Split the string",  into tokens delimited by spaces and commas
        token = strtok (str," ,");
        while (token != NULL)
        {
-            // printf("%s\n", token);
             if(line_num==1){
                 strncpy(parsed_config.node,token,sizeof parsed_config.node-1);
                 parsed_config.node[255] = '\0';
@@ -50,11 +38,8 @@ struct Parsed_config parse_config(){
             else{
                 if(n_tokens==0){
                     strncpy(parsed_config.element[line_num-3].node,token,sizeof parsed_config.element[line_num-3].node-1);
-                    // n1.name[255] = '\0';
                 }
                 if(n_tokens==1){
-                    // strncpy(parsed_config.element[line_num-3].dist,token,sizeof parsed_config.element[line_num-3].dist-1);
-                    // parsed_config.element[line_num-3].dist[255] = '\0';
                     int int_dist;
                     sscanf(token,"%d",&int_dist);
                     parsed_config.element[line_num-3].dist = int_dist;
@@ -64,36 +49,35 @@ struct Parsed_config parse_config(){
                     parsed_config.element[line_num-3].address[255] = '\0';
                 }
             }
-           // Different call
            token = strtok (NULL, " ,");
            n_tokens++;
        }
        line_num++;
     }
    parsed_config.num_rows = line_num-3;
-
-   printf("\nLines:%d",parsed_config.num_rows);
-    
-    
-
     fclose(fp);
     if (line)
         free(line);
-    printf("\nEND");
     return parsed_config;
 }
 
 void disp_routing_table (struct Routing_table rt) {
-    printf("\n--------------------");
+    /*
+        Print routing table
+    */
+    printf("\n-----------------------");
     printf("\nRouting table of %s",rt.node);
     printf("\nNode\tDist\tNextHop");
     for(int i = 0; i < rt.num_rows;i++){
         printf("\n%s\t%d\t%s",rt.element[i].node, rt.element[i].dist, rt.element[i].next_hop);
     }
-    printf("\n--------------------");
+    printf("\n-----------------------");
 }
 
 void disp_distance_vector (struct Distance_vector dv) {
+    /*
+        Print distance vector
+    */
     printf("\n--------------------");
     printf("\nDistance vector of %s",dv.sender);
     printf("\nNode\tDist");
@@ -109,32 +93,22 @@ struct Routing_table create_rt_from_parsed(struct Parsed_config parsed_config){
         Parse config file into parsed_config struct
         Use that struct to create rt table
     */
-    // struct Parsed_config parsed_config;
-    // parsed_config = test_parse_config_to_struct();
     struct Routing_table rt;
     strcpy(rt.node,parsed_config.node);
     rt.num_rows = parsed_config.num_rows;
     for(int i = 0; i < rt.num_rows;i++){
         strcpy(rt.element[i].node,parsed_config.element[i].node);
-        // int num;
-        // sscanf(parsed_config.element[i].dist,"%d",&num);
         rt.element[i].dist = parsed_config.element[i].dist;
         strcpy(rt.element[i].next_hop, parsed_config.element[i].node); 
     }
-    // rt.num_rows++;
-    // printf("%d",rt.num_rows:)
-    // strcpy(rt.element[rt.num_rows-1].node,rt.node);
-    // rt.element[rt.num_rows-1].dist = 0;
-    // strcpy(rt.element[rt.num_rows-1].next_hop,rt.node); 
-    // disp_routing_table(rt);
     return rt;
 }
 
 struct Distance_vector create_dv_from_rt(struct Routing_table rt){
+    /*
+        Create distance vector from routing table
+    */
     struct Distance_vector dv;
-    // struct Routing_table rt;
-    // rt = test_create_rt_from_parsed();
-    // disp_routing_table(rt);
     strcpy(dv.sender,rt.node);
     for(int i = 0; i < rt.num_rows; i++){
         dv.num_of_dests = rt.num_rows;
@@ -145,10 +119,10 @@ struct Distance_vector create_dv_from_rt(struct Routing_table rt){
 }
 
 struct Distance_vector convert_str_to_dv(char msg[]){
-    // Convert string to struct dv
-    // printf("\nmsg:%s",msg);
-   // Split the string into tokens delimited by spaces and commas
-    // printf("\nTokens:\n");
+    /*
+        Convert string to distance vector
+        String is message received through socket
+    */
     int n_tokens = 0;
     int line_num = 1;
     char *token = NULL;
@@ -158,73 +132,45 @@ struct Distance_vector convert_str_to_dv(char msg[]){
     int curr_neighbor = -1;
     while (token != NULL)
     {
-        // printf("\nn_tokens:%d,token:%s.", n_tokens,token);
-        // printf("\nsize:%zu",sizeof(*token));
         if(n_tokens == 0){
             strcpy(dv.sender,token);
             dv.sender[5] = '\0';
-            // printf("\nAdding sender:%s",token);
-            // printf("\ndv sender:%s.",dv.sender);
-
         }
         else if(n_tokens % 2 == 1 || n_tokens == 1){
             curr_neighbor++;
-            // printf("\n%d",curr_neighbor);
             strcpy(dv.element[curr_neighbor].dest,token);
             dv.sender[5] = '\0';
-            // printf("\nAdding neighbor:%s",token);
-            // printf("\ndv neighbor:%s.",dv.element[curr_neighbor].dest);
         }
         else if(n_tokens % 2 == 0){
             int int_dist;
             sscanf(token,"%d",&int_dist);
             dv.element[curr_neighbor].dist = int_dist;
-            // printf("\nAdding dist:%d",int_dist);
-            // printf("\ndv dist:%d.",dv.element[curr_neighbor].dist);
         }
-
-        // printf("\ncurr_n:%d",curr_neighbor);
-
-        // Different call
         token = strtok (NULL, " \r\n");
         n_tokens++;
         if (n_tokens % 2 == 0){
             neighbors++;
         }
-        // printf("\n");
     }
     dv.num_of_dests = neighbors;
-
-    // printf("\nnum_of_dests:%d",dv.num_of_dests);
-    // printf("\nsender:%s",dv.sender);
-    // printf("\n--------------------");
-    // printf("\nDistance vector of %s",dv.sender);
-    // printf("\nNode\tDist");
-
     return dv;
-
 }
 struct Routing_table update_routing(struct Distance_vector dv, struct Routing_table rt, struct Parsed_config pc){
-    // printf("\nUpdating routing");
+    /*
+        Update routing table based on distance vector and neighbors
+    */
     int add_to;
     for(int i = 0; i < pc.num_rows; i++){
-        printf("\npc element node:%s",pc.element[i].node);
         if(strcmp(dv.sender,pc.element[i].node)==0){
             add_to = pc.element[i].dist;
         }
     }
     for(int j = 0; j < dv.num_of_dests; j++){
-        // printf("\n%s\t%d\t%s",rt.element[i].node, rt.element[i].dist, rt.element[i].next_hop);
         int match = 0;
         for(int i = 0; i < rt.num_rows;i++){
-            // printf("\nChecking if rt %s matches dv%s ",rt.element[i].node,dv.element[j].dest);
-            // if(rt.element[i].node==dv.element[j].dest){ // Broken due to data change
             if(strcmp(rt.element[i].node,dv.element[j].dest)==0){
-                // printf("\tMatch");
                 match = 1;
-                // printf("\n\trt dist:%d\tdv dist:%d",rt.element[i].dist , dv.element[j].dist);
                 if(dv.element[j].dist + add_to < rt.element[i].dist){
-                    // printf("\nDecreasing distance");
                     rt.element[i].dist = dv.element[j].dist + add_to;
                     strcpy(rt.element[i].next_hop,dv.sender);
                 }
@@ -241,7 +187,5 @@ struct Routing_table update_routing(struct Distance_vector dv, struct Routing_ta
             strcpy(rt.element[rt.num_rows-1].next_hop, dv.sender);
         }
     }
-    // printf("\nAfter updating:");
-    // disp_routing_table(rt);
     return rt;
 }
